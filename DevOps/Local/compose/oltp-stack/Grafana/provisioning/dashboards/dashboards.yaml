@@ -1,12 +1,12 @@
 apiVersion: 1
 
 providers:
-  - name: fxqual-dashboards
+  - name: "fxqual-dashboards"
     type: file
-    folder: FX Qual Engine
-    disableDeletion: false
+    folder: "FX Qual Engine"
     editable: true
-    updateIntervalSeconds: 10  # Auto-refresh dashboard changes
+    disableDeletion: false
+    updateIntervalSeconds: 10
     options:
       path: /var/lib/grafana/dashboards
-      recurse: true           # Load dashboards from nested folders too
+      recurse: true

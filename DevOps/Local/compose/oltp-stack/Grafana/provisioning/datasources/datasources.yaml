@@ -4,15 +4,12 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://fx-prometheus:9090
+    url: http://fxqual-prometheus:9090
     isDefault: true
+    editable: true
 
   - name: Jaeger
     type: jaeger
     access: proxy
     url: http://fx-qual-jaeger:16686
-
-  - name: Loki
-    type: loki
-    access: proxy
-    url: http://fx-loki:3100
+    editable: true

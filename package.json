@@ -4,9 +4,17 @@
   "private": true,
   "description": "Local Docker orchestration for Forex-Qual-Engine-Rest-Reactive-Clients",
   "scripts": {
-    "local-docker:up": "sh ./DevOps/Local/docker-up.sh",
-    "local-docker:down": "sh ./DevOps/Local/docker-down.sh",
-    "local-docker:status": "sh ./DevOps/Local/docker-status.sh",
+
+    "local-docker:up": "sh ./DevOps/Local/compose/docker-up.sh",
+    "local-docker:down": "sh ./DevOps/Local/compose/docker-down.sh",
+    "local-docker:status": "sh ./DevOps/Local/compose/docker-status.sh",
+
+    "local-docker:network:create": "sh ./DevOps/Local/compose/docker-network.sh create",
+    "local-docker:network:delete": "sh ./DevOps/Local/compose/docker-network.sh delete",
+
+    "local-docker:volumes:create": "sh ./DevOps/Local/compose/docker-volumes.sh create",
+    "local-docker:volumes:delete": "sh ./DevOps/Local/compose/docker-volumes.sh delete",
+    "local-docker:volumes:prune":  "sh ./DevOps/Local/compose/docker-volumes.sh prune",
 
     "local-docker:kafka:logs": "docker logs -f local-kafka",
     "local-docker:postgres:logs": "docker logs -f local-postgres",

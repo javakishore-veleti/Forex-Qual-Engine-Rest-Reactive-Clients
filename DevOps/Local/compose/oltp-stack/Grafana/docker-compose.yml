@@ -1,29 +1,32 @@
 version: "3.9"
 
 services:
-  grafana:
+  fx-grafana:
     image: grafana/grafana:10.2.3
     container_name: fx-grafana
     ports:
       - "3000:3000"
+
     environment:
-      # Default admin credentials
+      # Admin credentials
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+
+      # Provisioning root
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
 
-      # Allow anonymous view access (SRE friendly)
+      # Anonymous access enabled (SRE-friendly)
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
 
-      # Show dashboards immediately
+      # Default dashboard folder
       - GF_DASHBOARDS_DEFAULT_HOME=/var/lib/grafana/dashboards
 
     volumes:
-      # Provisioning configurations (datasources + dashboards loader)
+      # Provisioning
       - ./provisioning:/etc/grafana/provisioning
 
-      # Actual dashboards JSON files
+      # Dashboards JSON
       - ./dashboards:/var/lib/grafana/dashboards
 
     networks:
