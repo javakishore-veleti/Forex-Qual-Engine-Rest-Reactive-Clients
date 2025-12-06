@@ -74,6 +74,8 @@ This repo is designed to showcase the KPIs, SLIs, SLOs, and saturation metrics a
     - `reactor_netty_request_pending`
 - JVM metrics: heap %, GC rate, allocation rate
 
+Read more below on above dimensions
+
 ### **3. Error Budget Burn Dashboard**
 From recording rules:
 - Fast burn rate (5m window)
@@ -364,6 +366,163 @@ This enables deep observability and expert-level SRE diagnostics.
 
 
 ---
+
+Read more below on dimensions mentioned above on "Resource Saturation Dashboard"
+
+#### Resource Saturation Dashboard — Human-Friendly Deep Explanation
+
+Saturation is one of the **Four Golden Signals of SRE** (Latency, Traffic, Errors, Saturation).  
+This dashboard helps teams understand **how close the service is to overload**, which directly affects latency, failures, and error budgets.
+
+This section explains each metric in simple, practical language — suitable for developers, senior engineers, SREs, and technical managers.
+
+---
+
+##### Dimension 1. Tomcat Thread Pool Saturation
+
+Tomcat is the inbound web server (for all REST controller requests).  
+It uses a **thread-per-request** model, which means:
+
+- Each request occupies one thread.
+- Too many requests → thread pool fills → requests queue → latency spikes → timeouts happen.
+
+### **🔹 `tomcat_threads_busy`**
+
+**What it measures:**  
+The number of Tomcat worker threads currently serving requests.
+
+**Why it matters:**  
+High thread usage means your service is approaching overload.
+
+**Interpreting the value:**
+
+| Usage Level | Meaning |
+|-------------|---------|
+| **< 70%** | Healthy |
+| **70–90%** | Warning — load increasing |
+| **> 90%** | Critical — risk of timeouts & 5xx errors |
+
+---
+
+##### Dimension 2. Tomcat Connection Pool Saturation
+
+### **🔹 `tomcat_connections_current`**
+
+**What it measures:**  
+The number of current open HTTP connections to Tomcat.
+
+**Why it matters:**  
+A rapid increase usually indicates:
+
+- Traffic spikes
+- Slow downstream dependencies
+- Clients retrying aggressively
+- Load-test or real production surge
+
+**Signs of problems:**
+
+- Increasing linearly → healthy scaling
+- Sudden vertical spikes → bottleneck forming
+- Flat at max → connection exhaustion
+
+---
+
+##### Dimension 3. Netty (WebClient) Event-Loop Saturation
+
+The Spring WebClient uses **Reactor Netty** internally, which is **non-blocking** and uses a small number of event-loop threads.
+
+### **🔹 `reactor_netty_request_pending`**
+
+**What it measures:**  
+Number of **in-flight WebClient requests waiting to be processed**.
+
+**Why it matters:**  
+This shows if your outbound HTTP traffic is overwhelming Netty’s event loops.
+
+**How to interpret:**
+
+| Value | Meaning |
+|-------|---------|
+| **Low & steady** | Healthy reactive system |
+| **Gradually rising** | Downstream slow / backpressure building |
+| **Spiking rapidly** | Netty overwhelmed → expect timeouts soon |
+| **Stuck high** | Hard saturation → failure cascade risk |
+
+---
+
+##### Dimension 4. JVM Resource Saturation
+
+Saturation inside the JVM tells you whether memory or GC slowdowns are limiting throughput.
+
+### **🔹 Heap Usage (%)**
+
+**What it measures:**  
+How much of your application memory is currently being used.
+
+**Why it matters:**  
+High heap = more GC = more application pause time.
+
+| Heap % | Meaning |
+|--------|---------|
+| **< 70%** | Optimal |
+| **70–85%** | Heavy memory load |
+| **> 85%** | Critical — risk of GC thrashing / OOM |
+
+---
+
+### **🔹 GC Rate / GC Pause**
+
+**What it measures:**  
+Frequency and duration of garbage collection pauses.
+
+**Why it matters:**  
+Frequent GC pauses directly increase:
+
+- API latency
+- tail latencies (p95/p99)
+- thread blocking
+
+If GC pause spikes → your latency spikes.
+
+---
+
+### **🔹 Allocation Rate**
+
+**What it measures:**  
+How fast your application is allocating new objects.
+
+**Why it matters:**  
+High allocation = more GC work = reduced throughput.
+
+**Expected behavior:**
+
+- Blocking clients (RestTemplate/RestClient): moderate allocations
+- WebClient/Reactive: higher short-lived allocations
+
+---
+
+#### Saturation Dimensions Summary Overview Table
+
+| Area | Metric | What It Indicates | Why It Matters |
+|------|--------|-------------------|----------------|
+| **Tomcat** | `tomcat_threads_busy` | Thread pool load | Predicts overload & timeouts |
+| **Tomcat** | `tomcat_connections_current` | Incoming connection pressure | Finds spikes & retry storms |
+| **Netty** | `reactor_netty_request_pending` | Event-loop & backpressure | Detects cascading failures early |
+| **JVM** | Heap % | Memory pressure | Predicts GC bottlenecks |
+| **JVM** | GC rate/pause | GC health | Impacts p95+ latency |
+| **JVM** | Allocation rate | Object churn | Silent performance killer |
+
+---
+
+This dashboard provides a **complete saturation picture**, allowing teams to catch:
+
+- Overload conditions
+- Thread starvation
+- Connection exhaustion
+- GC thrashing
+- Backpressure buildup
+
+*all before they become outages.*
 
 # 3. Recording Rules
 
