@@ -1,9 +1,8 @@
 package com.jk.labs.fx.qual_engine.integrations.product;
 
-import com.jk.labs.fx.qual_engine.dto.FxQualReq;
-import com.jk.labs.fx.qual_engine.dto.FxQualResp;
+import com.jk.labs.fx.qual_engine.dto.FxQualExecCtx;
 
 public interface ProductApiClient {
 
-    ProductApiResp getProductInfosByBookCodes(FxQualReq fxQualReq, FxQualResp fxQualResp);
+    ProductApiResp getProductInfosByBookCodes(FxQualExecCtx fxQualExecCtx);
 }
