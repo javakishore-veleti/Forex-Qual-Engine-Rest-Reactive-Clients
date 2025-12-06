@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
 @RestController
 @RequestMapping("/api/fx")
 @RequiredArgsConstructor
@@ -33,14 +31,16 @@ public class FxQualController {
         FxQualResp resp = new FxQualResp();
 
         FxQualExecCtx ctx = new FxQualExecCtx();
+
+        ctx.setQualReq(req);
+        ctx.setQualResp(resp);
+
         ctx.getQualResp().setClientType(clientType);
 
         fxQualEngineFacade.qualify(ctx);
 
-        resp.setExecEndDateTime(new Date());
-        resp.setEndTime(System.currentTimeMillis());
-        resp.setTimeTaken(resp.getEndTime() - resp.getStartTime());
-
+        // Aspect programming will update additional fields in resp object
+        // Review QuoteWfExecTrackingAdvice class
         return ResponseEntity.ok(resp);
     }
 }

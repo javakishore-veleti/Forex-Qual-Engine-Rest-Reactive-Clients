@@ -13,7 +13,7 @@ import java.util.Date;
 @Aspect
 @Component
 @Slf4j
-public class ExecutionTrackingAdvice {
+public class QuoteWfExecTrackingAdvice {
 
     @Around("@annotation(com.jk.labs.fx.qual_engine.util.QuoteRequestExecution)")
     public Object trackExecution(ProceedingJoinPoint pjp) throws Throwable {
