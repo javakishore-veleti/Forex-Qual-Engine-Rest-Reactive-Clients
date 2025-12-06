@@ -524,6 +524,259 @@ This dashboard provides a **complete saturation picture**, allowing teams to cat
 
 *all before they become outages.*
 
+Read more on the [Resource Saturation Dashboard](#resource-saturation-dashboard) below.
+
+# Error Budget Burn, Concurrency Scaling, and Downstream Dependency Dashboards
+### Human-Friendly Deep Explanations for Developers, SREs, and Engineering Leaders
+
+This document expands three critical observability dashboards used to evaluate system reliability, scalability, and dependency behavior in production microservices.
+
+---
+
+Read more on the [Error Budget Burn Dashboard](#error-budget-burn-dashboard) below.
+
+#### 3. Error Budget Burn Dashboard — Deep Explanation
+
+The **error budget** represents how much failure is acceptable before an SLO violation occurs.  
+This dashboard shows **how quickly your service is consuming its allowed failures**.
+
+It uses two burn windows:
+
+---
+
+###### 🔹 Fast Burn Rate (5-minute window)
+
+**What it measures:**  
+Short-term spike in error rate.
+
+**Why it matters:**  
+Detects **acute failures** such as:
+
+- sudden downstream outage
+- connection pool exhaustion
+- thread pool starvation
+- cascading failures
+
+**Interpretation:**
+
+| Fast Burn Rate | Meaning |
+|----------------|---------|
+| **< 1.0** | Within error budget |
+| **1.0 – 2.0** | Approaching SLO breach |
+| **> 2.0** | Immediate alert — budget burning too quickly |
+
+---
+
+##### 🔹 Slow Burn Rate (1-hour window)
+
+**What it measures:**  
+Sustained error patterns over a longer period.
+
+**Why it matters:**  
+Catches **chronic reliability issues**, including:
+
+- slow degradation
+- intermittent downstream instability
+- insufficient resources
+- retry storms or networking issues
+
+**Interpretation:**
+
+| Slow Burn Rate | Meaning |
+|----------------|---------|
+| **< 0.5** | Healthy |
+| **0.5 – 1.0** | At-risk |
+| **> 1.0** | SLO violation if trend continues |
+
+---
+
+##### 🔹 Error Budget %
+
+This shows how much of your monthly/weekly budget has been consumed.
+
+- **0–25%** → Safe
+- **25–75%** → Monitor
+- **> 75%** → Reliability risk
+- **100%** → SLO violated; freeze deployments recommended
+
+---
+
+##### 🔹 Alerts on Burnrate Thresholds
+Alerts are triggered when:
+
+- `burnrate_fast > 2.0`
+- `burnrate_slow > 1.0`
+- sustained 4xx/5xx exceed error budget
+
+**Why it matters:**  
+This ensures you detect failures *before customers feel them.*
+
+---
+
+Read more on the [Concurrency Scaling Dashboard](#concurrency-scaling-dashboard) below.
+
+#### 4. Concurrency Scaling Dashboard — Deep Explanation
+
+This dashboard helps engineering teams understand how the service behaves as **traffic and pod counts scale**, especially under high concurrency.
+
+---
+
+##### 🔹 CPU Usage Per Pod
+
+**What it measures:**  
+Compute pressure across pods.
+
+**Why it matters:**  
+Shows whether increased load is causing CPU throttling or hotspots.
+
+**Interpretation:**
+
+| CPU Level | Meaning |
+|-----------|---------|
+| **< 60%** | Healthy |
+| **60–80%** | Near scaling threshold |
+| **> 80%** | Scaling required / throttling risk |
+
+---
+
+##### 🔹 Memory Usage Per Pod
+
+**What it measures:**  
+How efficiently the JVM uses available memory.
+
+High memory usage → GC pressure → latency increase.
+
+---
+
+##### 🔹 Thread Usage
+
+Includes:
+
+- `jvm_threads_live_threads`
+- `tomcat_threads_busy`
+- Netty event-loop thread utilization (indirect via pending requests)
+
+**Why it matters:**
+
+| Signal | Problem |
+|--------|---------|
+| High Tomcat threads | Blocking call bottlenecks |
+| High Netty pending requests | Backpressure building |
+| High peak threads | Thread leaks or misconfiguration |
+
+---
+
+##### 🔹 Backpressure Events (WebClient)
+
+Observed through:
+
+- `reactor_netty_request_pending`
+- timeouts
+- increased retries
+
+**Why it matters:**  
+Shows when downstream systems cannot absorb the traffic your service is generating.
+
+---
+
+##### 🔹 Connection Pool Behavior
+
+Metrics include:
+
+- `http_client_pool_connections_active`
+- `tomcat_connections_current`
+- `reactor_netty_connection_provider_active_connections`
+
+**Symptoms of trouble:**
+
+| Behavior | Meaning |
+|----------|---------|
+| Sustained high active connections | Downstream slowness |
+| Idle stays zero | Exhausted pool |
+| Spikes in pending requests | Backpressure or overload |
+
+---
+
+##### 5. Downstream Dependency Health — Deep Explanation
+
+Your Forex Qualification Engine calls:
+
+- Customer Service
+- Promo Service
+- Product Books Service
+- Market Rates Service
+
+This dashboard answers:  
+**“Are we slow, or is our dependency slow?”**
+
+---
+
+##### 🔹 Promo / Customer / Product / Market Latency
+
+Each dependency has its own latency bucket (p50/p95/p99).  
+This identifies which external call contributes most to your end-to-end latency.
+
+Example interpretations:
+
+| Observation | Root Cause |
+|-------------|------------|
+| High p99 Promo latency | Promo API inconsistent / overloaded |
+| All dependencies slow | Network or DNS issue |
+| Only Market Rates API slow | Specific downstream bottleneck |
+
+---
+
+##### 🔹 Downstream Error Rates
+
+Uses metrics like:
+
+- `http_client_requests_seconds_count{status!~"2.."}`
+- retry counts
+- timeout counts
+
+Helps distinguish:
+
+| Pattern | Meaning |
+|---------|---------|
+| High 5xx | Downstream service failing |
+| High 4xx | Upstream request issue (bad input) |
+| High timeouts | Saturated dependency or network issues |
+| Spikes in retries | Retry storm → cascading failure risk |
+
+---
+
+##### 🔹 Cascading Failures
+
+These occur when one dependency becomes slow or unavailable, causing:
+
+- thread pool starvation
+- connection pool exhaustion
+- increased fast-burn rate
+- latency explosion across all endpoints
+
+This section visualizes early indicators:
+
+| Signal | Cascade Indicator |
+|--------|-------------------|
+| Rising `tomcat_threads_busy` | Waiting on slow downstream |
+| High Netty pending requests | Reactive backpressure |
+| Error rate spikes | Downstream failure spreading |
+| GC pauses increase | Memory pressure from blocked threads |
+
+---
+
+##### Summary Table
+
+| Dashboard | Key Metrics | What It Explains | Who Uses It |
+|-----------|-------------|------------------|--------------|
+| **Error Budget Burn** | burnrate_fast, burnrate_slow, error % | Reliability & SLO health | SRE, Platform |
+| **Concurrency Scaling** | CPU, memory, threads, backpressure | Scaling efficiency | Backend, SRE |
+| **Downstream Health** | dependency latency & error rates | If failures originate upstream or downstream | All engineering teams |
+
+---
+
+This documentation converts complex reliability concepts into clear, actionable insights that any engineer or technical leader can understand and apply.
+
 # 3. Recording Rules
 
 Stored in:
