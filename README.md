@@ -889,7 +889,7 @@ Only if:
 
 ---
 
-# 7. 🔥 Extended KPIs, SLIs, SLOs (15 each)
+# 7. Extended KPIs, SLIs, SLOs (15 each)
 
 ## 7.1 KPIs (Table)
 
