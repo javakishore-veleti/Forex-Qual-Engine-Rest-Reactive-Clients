@@ -1,6 +1,5 @@
 package com.jk.labs.fx.qual_engine.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
