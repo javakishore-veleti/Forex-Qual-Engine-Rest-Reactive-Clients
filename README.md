@@ -1,4 +1,4 @@
-# 📘 Forex-Qual-Engine-Rest-Reactive-Clients
+# Forex-Qual-Engine-Rest-Reactive-Clients
 
 A Spring Boot 3.5.x–based Forex Qualification Engine demonstrating three HTTP client strategies:
 
@@ -10,7 +10,7 @@ Built for **production-grade benchmarking**, **observability**, **SRE-driven ana
 
 ---
 
-# 🏛 1. Business Workflow — Forex Qualification Pipeline
+# 1. Business Workflow — Forex Qualification Pipeline
 
 The API:
 
