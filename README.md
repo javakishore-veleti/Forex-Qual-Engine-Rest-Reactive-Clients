@@ -526,8 +526,9 @@ This dashboard provides a **complete saturation picture**, allowing teams to cat
 
 Read more on the [Resource Saturation Dashboard](#resource-saturation-dashboard) below.
 
-# Error Budget Burn, Concurrency Scaling, and Downstream Dependency Dashboards
-### Human-Friendly Deep Explanations for Developers, SREs, and Engineering Leaders
+#### Error Budget Burn, Concurrency Scaling, and Downstream Dependency Dashboards
+
+##### Human-Friendly Deep Explanations for Developers, SREs, and Engineering Leaders
 
 This document expands three critical observability dashboards used to evaluate system reliability, scalability, and dependency behavior in production microservices.
 
