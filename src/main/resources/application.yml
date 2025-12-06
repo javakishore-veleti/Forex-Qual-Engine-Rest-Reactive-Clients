@@ -12,3 +12,14 @@ management:
 logging:
   pattern:
     level: "%5p [traceId:%X{traceId} spanId:%X{spanId}]"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /api-docs
+
+  enable-hateoas: false
+  enable-hal: false
+  data-rest:
+    enabled: false
