@@ -101,7 +101,7 @@ Read more below on dimensions mentioned above
 This document explains the **four key dimensions** used in the *Client Strategy Latency Comparison Dashboard* and how each dimension maps to **Prometheus**, **Grafana**, **Jaeger**, and the **OpenTelemetry Collector**.
 
 
-#### 1. URI Dimension
+#### Dimension 1. URI Dimension
 
 ##### What It Represents
 The API endpoint being invoked, such as `/api/fx/qualify`, `/customer/{id}`, `/promo/{code}`.
@@ -159,7 +159,7 @@ You may extend or rename these attributes before exporting.
 
 ---
 
-#### 2. HTTP Method Dimension
+#### Dimension 2. HTTP Method Dimension
 
 ##### What It Represents
 The HTTP verb associated with the request (GET, POST, PUT, DELETE).
@@ -215,7 +215,7 @@ Can be enriched or transformed for consistency.
 
 ---
 
-##### 3. Status Code Dimension
+#### Dimension 3. Status Code Dimension
 
 ##### What It Represents
 HTTP response status code (200, 400, 500).
@@ -276,7 +276,7 @@ Useful for routing:
 
 ---
 
-#### 4. Downstream Service Dimension
+#### Dimension 4. Downstream Service Dimension
 
 ##### What It Represents
 The external system called in the workflow, e.g.:
