@@ -100,16 +100,15 @@ Read more below on dimensions mentioned above
 
 This document explains the **four key dimensions** used in the *Client Strategy Latency Comparison Dashboard* and how each dimension maps to **Prometheus**, **Grafana**, **Jaeger**, and the **OpenTelemetry Collector**.
 
----
 
-# 1. URI Dimension
+#### 1. URI Dimension
 
 ## What It Represents
 The API endpoint being invoked, such as `/api/fx/qualify`, `/customer/{id}`, `/promo/{code}`.
 
 ---
 
-## Prometheus
+##### Prometheus
 Micrometer exposes URI as a low-cardinality label:
 
 ```
@@ -121,7 +120,7 @@ http_server_requests_seconds_bucket{uri="/api/fx/qualify", ...}
 
 ---
 
-## Grafana
+##### Grafana
 Use URI as a dashboard variable:
 
 ```
@@ -135,7 +134,7 @@ Recommended panels:
 
 ---
 
-## Jaeger
+##### Jaeger
 Span attribute:
 
 ```
@@ -148,7 +147,7 @@ Useful for:
 
 ---
 
-## OpenTelemetry Collector
+##### OpenTelemetry Collector
 Pass-through attribute:
 
 ```
@@ -160,14 +159,14 @@ You may extend or rename these attributes before exporting.
 
 ---
 
-# 2. HTTP Method Dimension
+#### 2. HTTP Method Dimension
 
 ## What It Represents
 The HTTP verb associated with the request (GET, POST, PUT, DELETE).
 
 ---
 
-## Prometheus
+##### Prometheus
 Micrometer exposes method label:
 
 ```
@@ -176,7 +175,7 @@ http_server_requests_seconds_count{method="POST"}
 
 ---
 
-## Grafana
+##### Grafana
 Use as a variable:
 
 ```
@@ -190,7 +189,7 @@ Useful for:
 
 ---
 
-## Jeager
+##### Jeager
 Span attribute:
 
 ```
@@ -204,7 +203,7 @@ Allows SREs and developers to:
 
 ---
 
-## OpenTelemetry Collector
+##### OpenTelemetry Collector
 Method forwarded automatically:
 
 ```
@@ -216,14 +215,14 @@ Can be enriched or transformed for consistency.
 
 ---
 
-# 3. Status Code Dimension
+##### 3. Status Code Dimension
 
-## What It Represents
+##### What It Represents
 HTTP response status code (200, 400, 500).
 
 ---
 
-## Prometheus
+##### Prometheus
 Captured in:
 
 ```
@@ -236,7 +235,7 @@ Recommended queries:
 
 ---
 
-## Grafana
+##### Grafana
 Create panels:
 - Error rate over time
 - Error heatmap grouped by status
@@ -249,7 +248,7 @@ label_values(http_server_requests_seconds_count, status)
 
 ---
 
-## Jaeger
+##### Jaeger
 Span attribute:
 
 ```
@@ -263,7 +262,7 @@ Useful for:
 
 ---
 
-## OpenTelemetry Collector
+##### OpenTelemetry Collector
 Forwarded as-is:
 
 ```
@@ -277,9 +276,9 @@ Useful for routing:
 
 ---
 
-# 4. Downstream Service Dimension
+#### 4. Downstream Service Dimension
 
-## What It Represents
+##### What It Represents
 The external system called in the workflow, e.g.:
 
 - `customer-service`
@@ -289,7 +288,7 @@ The external system called in the workflow, e.g.:
 
 ---
 
-## Prometheus
+##### Prometheus
 Captured using custom metrics or via WebClient instrumentation:
 
 ```
@@ -303,7 +302,7 @@ downstream="customer-service"
 
 ---
 
-## Grafana
+##### Grafana
 Recommended dashboards:
 - Latency per downstream
 - Error ratio per downstream
@@ -317,7 +316,7 @@ label_values(http_client_requests_seconds_count, clientName)
 
 ---
 
-## Jaeger
+##### Jaeger
 Span attributes:
 
 ```
@@ -332,7 +331,7 @@ Provides:
 
 ---
 
-## OpenTelemetry Collector
+##### OpenTelemetry Collector
 Dependency metadata is preserved:
 
 ```
@@ -346,7 +345,7 @@ Can be used for:
 
 ---
 
-# Summary
+#### Summary
 
 This document provides a production-ready breakdown of the **four primary dimensions** used in latency and performance analysis:
 
