@@ -4,7 +4,7 @@ A Spring Boot 3.5.x–based Forex Qualification Engine demonstrating three HTTP 
 
 - **RestTemplate** — legacy blocking
 - **RestClient** — modern Spring 6+ blocking
-- **WebClient** — reactive, non-blocking
+- **WebClient** — reactive, non‑blocking
 
 Built for **production-grade benchmarking**, **observability**, **SRE-driven analysis**, and **high‑concurrency performance comparisons** across blocking and non‑blocking paradigms.
 
@@ -62,70 +62,59 @@ This repo is designed to showcase the KPIs, SLIs, SLOs, and saturation metrics a
 ## Detailed SRE Dimensions & Dashboards
 
 ### **1. Client Strategy Latency Comparison Dashboard**
-- p50, p90, p95, p99, p999 for:
-    - RestTemplate
-    - RestClient
-    - WebClient
-- Dimensions:
-    - URI
-    - HTTP method
-    - status code
-    - downstream service
+- p50, p90, p95, p99, p999 for RestTemplate / RestClient / WebClient
+- Dimensions: URI, HTTP method, status code, downstream service
 
 ### **2. Resource Saturation Dashboard**
 - Tomcat thread pool:
     - `tomcat_threads_busy`
     - `tomcat_connections_current`
-- Netty event-loop pressure (WebClient):
+- Netty (WebClient):
     - `reactor_netty_request_pending`
-- JVM:
-    - Heap usage %
-    - Allocation rate
-    - GC pause p99
+- JVM metrics: heap %, GC rate, allocation rate
 
 ### **3. Error Budget Burn Dashboard**
-Based on the recording rules:
+From recording rules:
 - Fast burn rate (5m window)
 - Slow burn rate (1h window)
-- Error budget consumption %
-- SLO alerts (e.g., burnrate_fast > 1)
+- Error budget %
+- Alerts on burnrate thresholds
 
 ### **4. Concurrency Scaling Dashboard**
-Monitor impacts of scaling pods:
-- CPU saturation per pod
-- Memory usage per pod
-- Live vs peak threads
-- Backpressure in WebClient
-- Connection pool exhaustion
+- CPU per pod
+- Memory per pod
+- Thread usage
+- Backpressure events
+- Connection pool behavior
 
 ### **5. Downstream Dependency Health**
-- promo / customer / market latency
-- per-client type downstream error rate
-- cascading failure indicators
+- Promo / Customer / Product / Market latency
+- Downstream error rates
+- Cascading failures
 
 ---
 
-## Recording Rules
+# 3. Recording Rules
 
-Recording rules live here:
+Stored in:
 
 ```
 DevOps/Local/compose/oltp-stack/Prometheus/recording_rules.yml
 ```
 
-Rules include:
-- SLO burn
-- latency histograms
-- client-type comparisons
+Includes:
+- SLO burn rates
+- Latency histograms
+- Client-type comparisons
 - JVM + GC metrics
-- business KPIs
-- saturation metrics
+- Business KPIs
+- Saturation metrics
 
 ---
 
-# 3. Expert Java Developers — Deep Technical Insights
+# 4. Expert Java Developers — Deep Technical Insights
 
-This repo is also built for senior/principal Java engineers who care about concurrency, thread models, and JVM behavior.
+For senior/principal Java engineers understanding concurrency, threading, and JVM mechanics.
 
 ---
 
@@ -133,116 +122,176 @@ This repo is also built for senior/principal Java engineers who care about concu
 
 ### **RestTemplate & RestClient (Blocking)**
 - Thread-per-request model (Tomcat)
-- Uses servlet worker threads
-- Predictable but limited concurrency
-- Latency directly increases thread occupancy
-- Connection pool saturation is the main bottleneck
+- Predictable and synchronous
+- Higher thread usage under load
+- Connection pool saturation is bottleneck
 
 ### **WebClient (Non-Blocking)**
-- Event‑loop model via Netty
-- Allows thousands of concurrent requests with a few threads
-- Requires proper:
-    - backpressure
-    - timeouts
-    - concurrency limits
-    - scheduler control
+- Event-loop system (Netty)
+- Thousands of concurrent requests
+- Requires:
+    - Backpressure
+    - Timeouts
+    - Bounded concurrency
+    - Scheduler control
 
 ---
 
-## JVM & Concurrency Considerations
+## JVM & Concurrency Details
 
-### **1. Allocation Hotspots**
-Reactive chains generate short-lived allocations.  
-Blocking IO holds memory longer and increases GC load.
+### Allocation & GC
+- Reactive chains → many short-lived allocations
+- Blocking IO → longer-lived objects + higher GC pressure
 
-### **2. CPU Behavior**
-- RestTemplate/RestClient → steady CPU usage
-- WebClient → more context switching but higher throughput
+### CPU Behavior
+- RestTemplate / RestClient → stable CPU
+- WebClient → higher throughput but more context switching
 
-### **3. Thread Pool Design**
-- Blocking clients → Apache HttpClient or JDK HttpClient pools
-- WebClient → event loop + reactor connection pool
+### Thread Pools
+- Blocking → Apache HttpClient/JDK HttpClient pools
+- Reactive → event-loop workers + reactor connection pool
 
-### **4. Backpressure Safety**
-WebClient requires:
-- `.timeout(...)`
-- bounded concurrency (`flatMap(concurrency=X)`)
-- controlled schedulers
+### Backpressure
+- Must explicitly manage with WebClient
+- Avoid unbounded concurrency
 
-### **5. Error Propagation**
-- Blocking → exceptions bubble directly
-- Reactive → errors propagate through the reactive chain
+### Error Propagation
+- Blocking → standard exceptions
+- Reactive → error flows inside operator chain
 
 ---
 
-## 4. How to Achieve Non‑Blocking Behavior While Using Tomcat (Servlet Stack)
+# 5. Achieving Non‑Blocking Behavior While Using Tomcat
 
-Even though **Tomcat is the primary web server**, your application still achieves non‑blocking IO **whenever WebClient is used**.
+Even though the application uses **Tomcat as the main HTTP server**, WebClient remains entirely **non-blocking for outbound calls** via Reactor Netty.
 
-### ✔ Tomcat handles inbound requests (blocking)
-- Uses servlet worker threads (`http-nio-8080`)
-- Each incoming HTTP request occupies exactly one Tomcat thread
+## Breakdown
 
-### ✔ WebClient uses Netty under the hood
-Provided by this dependency:
+| Layer | Technology | Blocking? |
+|-------|-----------|-----------|
+| Inbound server | Tomcat | Yes |
+| Outbound WebClient | Reactor Netty | No |
+| DB operations (R2DBC) | Reactive | No |
+| Business logic | App code | Mixed |
 
-```
-spring-boot-starter-webflux
-```
-
-→ Internally uses *reactor-netty* regardless of the main web server.
-
-### ✔ What becomes non-blocking?
-
-Only **outbound HTTP calls** become non-blocking:
-
-```
-WebClient → Netty → event-loop threads → async downstream calls
-```
-
-Tomcat worker thread is only blocked *until* the reactive chain completes (unless you isolate it — optional).
-
-### ✔ How to make the entire request path fully non-blocking?
-
-You would need to:
-1. Remove `spring-boot-starter-web`
-2. Use only `spring-boot-starter-webflux`
-3. Switch from Tomcat → Netty
-4. Rewrite controllers to return `Mono<FxQualResp>`
-
-### ✔ What you have today (best for 99% of enterprises)
-
-**Hybrid model:**
-
-| Part | Technology | Blocking? |
-|------|------------|-----------|
-| Inbound Web Server | Tomcat | Yes |
-| Outbound HTTP (WebClient) | Netty | No |
-| Business Logic | Yours | Depends |
-| DB (R2DBC) | Yes (non-blocking) | No |
-
-This is **realistic and extremely common**.  
-It matches **Fortune 100** microservice patterns — most teams do NOT fully switch to Netty.
+This is the **realistic production architecture** used by **Fortune 100 companies**.
 
 ---
 
-# Running the Engine
+# 6. Tomcat vs Netty Distinction
+
+| Topic | Tomcat | Netty |
+|-------|--------|--------|
+| Role in this project | Inbound HTTP Server | Outbound HTTP Client (WebClient) |
+| Model | Thread-per-request | Event-loop |
+| Blocking? | Yes | No |
+| Best for | Traditional REST APIs | High concurrency downstream calls |
+| Used for request handling? | Yes | No |
+| Used for WebClient? | No | Yes |
+
+### Can you run both?
+
+Yes — your project **already does**:
+
+- `spring-boot-starter-web` → Tomcat server
+- `spring-boot-starter-webflux` → Reactor Netty for WebClient
+
+### Should you switch Tomcat → Netty for everything?
+
+Only if:
+- You want *full reactive end-to-end*
+- You remove the servlet stack
+- You rewrite controllers to return `Mono<>`
+
+99% of enterprises keep **Tomcat + WebClient hybrid**.
+
+---
+
+# 7. 🔥 Extended KPIs, SLIs, SLOs (15 each)
+
+## 7.1 KPIs (Table)
+
+| KPI | Description | Prometheus Metric | Grafana Panel | Jaeger | OTel Collector |
+|-----|-------------|------------------|---------------|--------|----------------|
+| Qualification latency | End‑to‑end latency | http_server_requests_seconds | Latency graph | Trace timing | Export via OTLP |
+| Customer API latency | Downstream latency | http_client_duration_seconds | Downstream panel | Span child | OTLP metrics |
+| Promo API latency | Same | Same | Same | Same | Same |
+| Product API latency | Same | Same | Same | Same | Same |
+| Market API latency | Same | Same | Same | Same | Same |
+| Workflow latency | Total pipeline | custom fxqual_workflow_seconds | Workflow dashboard | Composite span | Custom OTLP |
+| RPS | Throughput | http_server_requests_seconds_count | RPS panel | n/a | Metrics pipeline |
+| Success rate | 2xx requests | http_server_requests_seconds_count | Success gauge | n/a | OTLP |
+| Error rate | 4xx/5xx | http_server_requests_seconds_count | Error % | Error spans | OTLP |
+| Heap usage | JVM memory | jvm_memory_used_bytes | JVM dashboard | n/a | JVM exporter |
+| GC pauses | GC time | jvm_gc_pause_seconds | GC heatmap | n/a | JMX → OTLP |
+| Tomcat threads | Busy threads | tomcat_threads_busy | Thread panel | n/a | Micrometer |
+| Netty connection usage | Pending ops | reactor_netty_request_pending | Netty panel | n/a | Micrometer |
+| CPU per pod | Pod CPU | container_cpu_usage_seconds_total | K8s panel | n/a | K8s receiver |
+| P99 stability | Latency variance | Histogram quantiles | Percentile panel | Trace analytics | OTLP |
+
+---
+
+## 7.2 SLIs (Table)
+
+| SLI | Definition | Prometheus | Grafana | Jaeger | OTel Collector |
+|-----|------------|------------|---------|--------|----------------|
+| Availability | Success / total | success / total | Uptime panel | n/a | Metrics |
+| p90 latency | 90th percentile | histogram_quantile | Percentile | Span timing | OTLP |
+| p95 latency | 95th percentile | Same | Same | Same | Same |
+| p99 latency | 99th percentile | Same | Same | Same | Same |
+| Request error ratio | errors/req | error counts | Error ratio panel | Error spans | OTLP |
+| Downstream error ratio | same but client | client_error_total | Downstream errors | Spans | OTLP |
+| Workflow success ratio | success workflows | custom metric | Workflow panel | Trace success | OTLP |
+| DB latency | DB op duration | db_query_seconds | DB panel | DB spans | OTLP |
+| Thread saturation | busy/max threads | tomcat_threads_busy | Thread heatmap | n/a | Micrometer |
+| Connection saturation | conn used/max | http_client_pool_* | Pool panel | n/a | OTLP |
+| Backpressure | reactor backpressure events | reactor_* | Reactive panel | n/a | Micrometer |
+| Timeouts | timeout occurrences | http_client_timeout_total | Timeout graph | Timeout span | OTLP |
+| Retries | retry count | resilience4j_retry_calls | Retry panel | Span tags | OTLP |
+| GC frequency | GC events/min | jvm_gc_pause_seconds_count | GC panel | n/a | JVM exporter |
+| Pod restarts | restart count | kube_pod_container_status_restarts | K8s panel | n/a | K8s receiver |
+
+---
+
+## 7.3 SLOs (Table)
+
+| SLO | Target | Prometheus Rule | Grafana | Jaeger | OTel Collector |
+|-----|--------|------------------|---------|--------|----------------|
+| Availability | 99.9% | error_budget_burn | SLO panel | n/a | OTLP |
+| p95 < 150ms | Latency SLO | quantile alert | Latency SLO | Traces | OTLP |
+| p99 < 350ms | High percentile | Same | Same | Same | Same |
+| Error < 0.5% | Error SLO | error_rate > .005 | Error SLO panel | Error spans | OTLP |
+| Downstream errors < 1% | Per client | downstream_error > .01 | Downstream SLO | Spans | OTLP |
+| CPU < 70% | Pod CPU | cpu_usage > 70 | CPU panel | n/a | K8s receiver |
+| Memory < 80% | Pod memory | mem_usage > 80 | Memory panel | n/a | K8s |
+| GC pauses < 200ms | GC pause limit | gc_pause > .2 | GC panel | n/a | JVM |
+| Tomcat busy < 85% | Thread SLO | threads_busy > .85 | Thread panel | n/a | Micrometer |
+| Netty pending < 50 | Pending ops | netty_pending > 50 | Netty panel | n/a | Micrometer |
+| Timeout rate < 1/min | Timeout SLO | timeout > 1 | Timeout panel | Timeout spans | OTLP |
+| Retry rate < 5/min | Reliability | retry > 5 | Retry graph | Span tags | OTLP |
+| DB latency < 20ms | DB SLO | db_latency >20 | DB panel | DB spans | OTLP |
+| Workflow success > 99% | End-to-end | workflow_success < 99 | SLO panel | Trace root | OTLP |
+| Pod restarts < 1/day | Stability | restart > 1 | K8s panel | n/a | K8s |
+
+---
+
+# 8. Running the Engine
 
 Start WireMock:
 
-```bash
+```
 docker compose -f DevOps/Local/compose/wiremock/docker-compose.yml up
 ```
 
-Run application:
+Run the app:
 
-```bash
+```
 ./mvnw spring-boot:run
 ```
 
 Call API:
 
-```bash
+```
 curl -X POST "http://localhost:8080/api/fx/qualify?clientType=web_client"   -H "Content-Type: application/json"   -d '{ "customerId": "123", "pair": "EURUSD", "promoCode": "WELCOME" }'
 ```
 
@@ -252,10 +301,8 @@ curl -X POST "http://localhost:8080/api/fx/qualify?clientType=web_client"   -H "
 
 This repository is a **complete production blueprint** for:
 
-- comparing blocking vs reactive strategies
-- understanding JVM, threads, GC, pools
-- evaluating microservice efficiency at scale
-- observing SRE-grade Golden Signals
-- deterministic testing using WireMock
-- deep performance analysis for senior Java engineers  
-
+- Comparing blocking vs reactive HTTP clients
+- Understanding JVM, GC, threads, & connection pools
+- Running SRE-grade observability with Prometheus/Grafana/Otel
+- Demonstrating Fortune‑100 hybrid Tomcat + WebClient patterns
+- Delivering high‑concurrency workflow orchestration  
