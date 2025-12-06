@@ -18,6 +18,7 @@ services:
       # Enables CORS → required for WebClient, RestClient demos
       WIREMOCK_ENABLE_CORS: "true"
       WIREMOCK_VERBOSE: "true"
+      WIREMOCK_OPTIONS: "--local-response-templating"
 
     networks:
       - fxqual-local-net

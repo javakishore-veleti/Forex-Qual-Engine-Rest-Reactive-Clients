@@ -1,0 +1,23 @@
+{
+  "requestedPromoCodes": {{jsonPath request.body '$.promoCodes'}},
+"validPromoCodes": [
+{{#each (jsonPath request.body '$.promoCodes')}}
+{{#ifeq this 'FXVIP25'}}
+"{{this}}"
+{{/ifeq}}
+{{#ifeq this 'WELCOME10'}}
+"{{this}}"
+{{/ifeq}}
+{{/each}}
+],
+"invalidPromoCodes": [
+{{#each (jsonPath request.body '$.promoCodes')}}
+{{#ifneq this 'FXVIP25'}}
+{{#ifneq this 'WELCOME10'}}
+"{{this}}"
+{{/ifneq}}
+{{/ifneq}}
+{{/each}}
+],
+"discountPercent": "{{#contains (jsonPath request.body '$.promoCodes') 'FXVIP25'}}25{{else}}10{{/contains}}"
+}

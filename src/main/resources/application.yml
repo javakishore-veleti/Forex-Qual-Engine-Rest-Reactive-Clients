@@ -23,3 +23,13 @@ springdoc:
   enable-hal: false
   data-rest:
     enabled: false
+
+integrations:
+  customer:
+    base-url: http://localhost:8083/api/customer
+  product:
+    base-url: http://localhost:8083/api/product
+  promo:
+    base-url: http://localhost:8083/api/promo
+  market-data:
+    base-url: http://localhost:8083/api/market

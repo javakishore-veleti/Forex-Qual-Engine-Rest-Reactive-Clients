@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/trading-book/([A-Za-z0-9\\-]+)"
+  },
+  "response": {
+    "status": 200,
+    "transformers": ["response-template"],
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\n  \"bookId\": \"{{request.pathSegments.[2]}}\",\n  \"desk\": \"G10-FX\",\n  \"maxQuoteSize\": 10000000,\n  \"permissions\": [\"SPOT\", \"FORWARDS\", \"NDF\"]\n}"
+  }
+}

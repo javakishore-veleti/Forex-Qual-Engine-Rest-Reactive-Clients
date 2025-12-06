@@ -1,0 +1,16 @@
+{
+  "priority": 5,
+  "scenarioName": "CustomerFlap",
+  "requiredScenarioState": "FAIL-2",
+  "newScenarioState": "SLOW",
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/customer/.*"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-smart-response.json",
+    "fixedDelayMilliseconds": 3000,
+    "transformers": ["response-template"]
+  }
+}

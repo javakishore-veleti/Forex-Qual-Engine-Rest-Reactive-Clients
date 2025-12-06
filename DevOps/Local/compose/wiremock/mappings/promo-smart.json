@@ -1,0 +1,8 @@
+{
+  "request": { "method": "POST", "url": "/api/promo/validate" },
+  "response": {
+    "status": 200,
+    "transformers": ["response-template"],
+    "bodyFileName": "promo-smart-response.json"
+  }
+}

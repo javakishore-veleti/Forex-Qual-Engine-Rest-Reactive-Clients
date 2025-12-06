@@ -1,8 +1,5 @@
 {
-  "pair": "EURUSD",
-  "bid": 1.0821,
-  "ask": 1.0824,
-  "mid": 1.08225,
-  "timestamp": "2025-01-01T12:00:00Z",
-  "source": "WireMock-MarketData"
+  "currencyPair": "EUR/USD",
+  "rate": 1.0855,
+  "timestamp": "2025-01-01T10:05:00Z"
 }

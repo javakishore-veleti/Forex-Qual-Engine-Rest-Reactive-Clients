@@ -1,0 +1,13 @@
+{
+  "scenarioName": "CustomerServiceFlap",
+  "requiredScenarioState": "FAIL-1",
+  "newScenarioState": "FAIL-2",
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/customer/.*"
+  },
+  "response": {
+    "status": 500,
+    "body": "{ \"error\": \"Service temporary failure 2\" }"
+  }
+}

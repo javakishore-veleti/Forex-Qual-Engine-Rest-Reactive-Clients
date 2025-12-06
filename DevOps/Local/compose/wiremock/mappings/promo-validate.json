@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/promo/validate"
+  },
+  "response": {
+    "status": 200,
+    "transformers": ["response-template"],
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\n  \"requestedPromoCodes\": {{jsonPath request.body '$.promoCodes'}},\n  \"validPromoCodes\": {{jsonPath request.body '$.promoCodes'}},\n  \"invalidPromoCodes\": [],\n  \"discountPercent\": {{randomInt min=1 max=20}}\n}"
+  }
+}

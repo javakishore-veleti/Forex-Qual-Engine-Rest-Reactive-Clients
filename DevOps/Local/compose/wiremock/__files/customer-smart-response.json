@@ -1,0 +1,6 @@
+{
+  "customerId": "{{request.path.[2]}}",
+  "customerName": "{{#ifeq request.path.[2] 'CUST999'}}VIP Alpha Fund{{else}}Standard User{{/ifeq}}",
+  "customerStatus": "{{#ifeq request.path.[2] 'CUST-BLOCKED'}}BLOCKED{{else}}ACTIVE{{/ifeq}}",
+  "riskTier": "{{#ifeq request.path.[2] 'CUST999'}}LOW{{else}}STANDARD{{/ifeq}}"
+}

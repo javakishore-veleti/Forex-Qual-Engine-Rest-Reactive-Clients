@@ -1,0 +1,14 @@
+{
+  "priority": 5,
+  "scenarioName": "CustomerFlap",
+  "requiredScenarioState": "FAIL-1",
+  "newScenarioState": "FAIL-2",
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/customer/.*"
+  },
+  "response": {
+    "status": 500,
+    "body": "{ \"error\": \"Flap fail #2\" }"
+  }
+}

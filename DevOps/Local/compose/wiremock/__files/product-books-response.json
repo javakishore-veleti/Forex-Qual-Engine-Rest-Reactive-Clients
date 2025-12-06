@@ -1,17 +1,4 @@
 {
-  "validBookCodes": [
-    {
-      "tradingBookId": "FX-SPOT-001",
-      "description": "FX Spot Trading Book"
-    },
-    {
-      "tradingBookId": "FX-FWD-002",
-      "description": "FX Forward Trading Book"
-    },
-    {
-      "tradingBookId": "FX-OPTIONS-003",
-      "description": "FX Options Trading Book"
-    }
-  ],
+  "validBookCodes": ["FX-BOOK-1", "FX-BOOK-2"],
   "invalidBookCodes": []
 }

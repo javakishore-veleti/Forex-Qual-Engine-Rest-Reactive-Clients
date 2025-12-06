@@ -1,13 +1,14 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/customer/([A-Za-z0-9_-]+)"
+    "urlPattern": "/api/customer/([A-Za-z0-9\\-]+)"
   },
   "response": {
     "status": 200,
-    "bodyFileName": "customer-response.json",
     "headers": {
       "Content-Type": "application/json"
-    }
+    },
+    "transformers": ["response-template"],
+    "body": "{\n  \"customerId\": \"{{request.pathSegments.[2]}}\",\n  \"customerName\": \"Customer {{request.pathSegments.[2]}}\",\n  \"customerEmail\": \"{{request.pathSegments.[2]}}@example.com\",\n  \"customerStatus\": \"ACTIVE\"\n}"
   }
 }

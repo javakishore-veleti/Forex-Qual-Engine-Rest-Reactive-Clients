@@ -1,0 +1,12 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPattern": "/api/customer/ERR.*"
+  },
+  "response": {
+    "status": 500,
+    "body": "{ \"error\": \"Simulated failure for testing\" }",
+    "headers": { "Content-Type": "application/json" }
+  }
+}

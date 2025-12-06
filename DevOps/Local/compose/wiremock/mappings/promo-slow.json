@@ -1,0 +1,9 @@
+{
+  "request": { "method": "POST", "url": "/api/promo/validate" },
+  "response": {
+    "status": 200,
+    "fixedDelayMilliseconds": 4500,
+    "bodyFileName": "promo-smart-response.json",
+    "transformers": ["response-template"]
+  }
+}
