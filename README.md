@@ -98,7 +98,7 @@ From recording rules:
 
 Read more below on dimensions mentioned above
 
-#### Dimensions Notes for Client Strategy Latency Comparison
+#### <span style="color: blue;"><b>Dimensions Notes for Client Strategy Latency Comparison</b></span>
 
 This document explains the **four key dimensions** used in the *Client Strategy Latency Comparison Dashboard* and how each dimension maps to **Prometheus**, **Grafana**, **Jaeger**, and the **OpenTelemetry Collector**.
 
