@@ -7,6 +7,7 @@ import com.jk.labs.fx.qual_engine.telemetry.OtelSpanUtil;
 import com.jk.labs.fx.qual_engine.telemetry.metrics.FxQualMetrics;
 import com.jk.labs.fx.qual_engine.service.FxQualEngineFacade;
 import com.jk.labs.fx.qual_engine.util.QuoteRequestExecution;
+import io.micrometer.core.instrument.Timer;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
@@ -31,6 +32,13 @@ public class FxQualEngineFacadeImpl implements FxQualEngineFacade {
     @Override
     public int qualify(FxQualExecCtx ctx) {
         log.info("qualify: Starting with client type {}", ctx.getClientType());
+
+        // ---------------------------------------------------------
+        // NEW METRICS: method invocation + timer start
+        // ---------------------------------------------------------
+        metrics.invocationCounter("FxQualEngineFacade.qualify").increment();
+        Timer.Sample sample = Timer.start();
+        // ---------------------------------------------------------
 
         // ROOT SPAN (important!)
         Span root = tracer.spanBuilder("fxqual.qualify")
@@ -68,6 +76,13 @@ public class FxQualEngineFacadeImpl implements FxQualEngineFacade {
             log.error("qualify: Error during execution", ex);
             throw ex;
         } finally {
+
+            // ---------------------------------------------------------
+            // NEW METRICS: stop timer (measure full duration)
+            // ---------------------------------------------------------
+            sample.stop(metrics.workflowTimer(ctx.getClientType()));
+            // ---------------------------------------------------------
+
             // --- END ROOT SPAN ---
             root.end();
 

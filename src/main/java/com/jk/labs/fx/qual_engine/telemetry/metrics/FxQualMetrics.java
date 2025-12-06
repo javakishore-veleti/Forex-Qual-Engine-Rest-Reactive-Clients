@@ -1,10 +1,10 @@
 package com.jk.labs.fx.qual_engine.telemetry.metrics;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.DistributionSummary;
-import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.*;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
+@Getter
 @Component
 public class FxQualMetrics {
 
@@ -25,20 +25,13 @@ public class FxQualMetrics {
                 .register(registry);
     }
 
-    // ---------------------------------------------------------
-    // SIMPLE COUNTERS
-    // ---------------------------------------------------------
-    public void recordQuoteRequested() {
-        quotesRequested.increment();
-    }
+    // --------------------------------------------------------------------
+    // 1. SIMPLE COUNTERS
+    // --------------------------------------------------------------------
+    public void recordQuoteRequested() { quotesRequested.increment(); }
 
-    public void recordQuoteQualified() {
-        quotesQualified.increment();
-    }
+    public void recordQuoteQualified() { quotesQualified.increment(); }
 
-    // ---------------------------------------------------------
-    // DYNAMIC COUNTER: promo usage (tag = promoCode)
-    // ---------------------------------------------------------
     public void recordPromoUsage(String promoCode) {
         Counter.builder("fxqual_promo_usage_total")
                 .description("Total number of promo validations")
@@ -47,9 +40,6 @@ public class FxQualMetrics {
                 .increment();
     }
 
-    // ---------------------------------------------------------
-    // DISTRIBUTION SUMMARY (currency pair tagged)
-    // ---------------------------------------------------------
     public void recordNotional(String currencyPair, double notional) {
         DistributionSummary.builder("fxqual_volume_notional")
                 .description("Trade notional value by currency pair")
@@ -57,5 +47,35 @@ public class FxQualMetrics {
                 .tag("pair", currencyPair)
                 .register(registry)
                 .record(notional);
+    }
+
+    // --------------------------------------------------------------------
+    // 2. **METHOD INVOCATION COUNTER** (new)
+    // --------------------------------------------------------------------
+    public Counter invocationCounter(String methodName) {
+        return Counter.builder("fxqual_method_invocations_total")
+                .description("Java method invocation counter")
+                .tag("method", methodName)
+                .register(registry);
+    }
+
+    // --------------------------------------------------------------------
+    // 3. **WORKFLOW TIMER** (new)
+    // --------------------------------------------------------------------
+    public Timer workflowTimer(String clientType) {
+        return Timer.builder("fxqual_workflow_duration_ms")
+                .description("Full workflow execution time")
+                .tag("clientType", clientType)
+                .register(registry);
+    }
+
+    // --------------------------------------------------------------------
+    // 4. **STEP TIMER** (per API call)
+    // --------------------------------------------------------------------
+    public Timer stepTimer(String stepName) {
+        return Timer.builder("fxqual_step_duration_ms")
+                .description("Downstream service call duration")
+                .tag("step", stepName)
+                .register(registry);
     }
 }

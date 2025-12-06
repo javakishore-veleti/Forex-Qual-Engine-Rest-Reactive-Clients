@@ -20,6 +20,7 @@ public class FxQualRestClientImpl extends GenericQualWFExecImpl<CustomerRestClie
     private final ProductRestClientImpl productClient;
     private final FxInterestRestClientImpl fxInterestApiClient;
 
+
     @PostConstruct
     public void setup() {
         super.setCustomerClient( customerClient);
