@@ -524,8 +524,6 @@ This dashboard provides a **complete saturation picture**, allowing teams to cat
 
 *all before they become outages.*
 
-Read more on the [Resource Saturation Dashboard](#resource-saturation-dashboard) below.
-
 #### Error Budget Burn, Concurrency Scaling, and Downstream Dependency Dashboards
 
 ##### Human-Friendly Deep Explanations for Developers, SREs, and Engineering Leaders
