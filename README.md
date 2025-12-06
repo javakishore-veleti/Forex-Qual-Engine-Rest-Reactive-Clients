@@ -106,13 +106,14 @@ Monitor impacts of scaling pods:
 ---
 
 ## Recording Rules
-Full Prometheus rules are maintained here:
+
+Recording rules live here:
 
 ```
 DevOps/Local/compose/oltp-stack/Prometheus/recording_rules.yml
 ```
 
-These include:
+Rules include:
 - SLO burn
 - latency histograms
 - client-type comparisons
@@ -133,57 +134,95 @@ This repo is also built for senior/principal Java engineers who care about concu
 ### **RestTemplate & RestClient (Blocking)**
 - Thread-per-request model (Tomcat)
 - Uses servlet worker threads
-- Best for straightforward synchronous workflows
+- Predictable but limited concurrency
 - Latency directly increases thread occupancy
-- Connection pool saturation is key bottleneck
+- Connection pool saturation is the main bottleneck
 
 ### **WebClient (Non-Blocking)**
 - Event‑loop model via Netty
-- Allows thousands of requests with few threads
-- Requires careful handling:
+- Allows thousands of concurrent requests with a few threads
+- Requires proper:
     - backpressure
     - timeouts
-    - concurrency operators
-- Suitable for high fan-out or async scenarios (5% of workloads)
+    - concurrency limits
+    - scheduler control
 
 ---
 
 ## JVM & Concurrency Considerations
 
 ### **1. Allocation Hotspots**
-High GC pressure is expected when running N concurrent requests:
-- Reactive chains produce small temporary objects
-- Blocking IO holds memory longer
+Reactive chains generate short-lived allocations.  
+Blocking IO holds memory longer and increases GC load.
 
 ### **2. CPU Behavior**
-- RestTemplate/RestClient → predictable CPU usage
-- WebClient → more context switching, but better at scale
+- RestTemplate/RestClient → steady CPU usage
+- WebClient → more context switching but higher throughput
 
 ### **3. Thread Pool Design**
-- RestTemplate/RestClient → Apache HttpClient or JDK HttpClient pools
-- WebClient → event loop + connection pool interplay
+- Blocking clients → Apache HttpClient or JDK HttpClient pools
+- WebClient → event loop + reactor connection pool
 
-### **4. Deadlock/Backpressure Safety**
+### **4. Backpressure Safety**
 WebClient requires:
-- `.timeout()`
+- `.timeout(...)`
 - bounded concurrency (`flatMap(concurrency=X)`)
 - controlled schedulers
 
-### **5. Error Propagation Differences**
-- Blocking → exceptions thrown immediately
-- Reactive → errors travel Mono/Flux chain
+### **5. Error Propagation**
+- Blocking → exceptions bubble directly
+- Reactive → errors propagate through the reactive chain
 
 ---
 
-## Performance Expectations Under Load
+## 4. How to Achieve Non‑Blocking Behavior While Using Tomcat (Servlet Stack)
 
-| Aspect | RestTemplate | RestClient | WebClient |
-|--------|--------------|------------|-----------|
-| Latency | Medium | Medium | Lowest |
-| Throughput | Medium | High | Very High |
-| Thread Usage | High | High | Very Low |
-| Backpressure | None | None | Yes |
-| Complexity | Low | Low | High |
+Even though **Tomcat is the primary web server**, your application still achieves non‑blocking IO **whenever WebClient is used**.
+
+### ✔ Tomcat handles inbound requests (blocking)
+- Uses servlet worker threads (`http-nio-8080`)
+- Each incoming HTTP request occupies exactly one Tomcat thread
+
+### ✔ WebClient uses Netty under the hood
+Provided by this dependency:
+
+```
+spring-boot-starter-webflux
+```
+
+→ Internally uses *reactor-netty* regardless of the main web server.
+
+### ✔ What becomes non-blocking?
+
+Only **outbound HTTP calls** become non-blocking:
+
+```
+WebClient → Netty → event-loop threads → async downstream calls
+```
+
+Tomcat worker thread is only blocked *until* the reactive chain completes (unless you isolate it — optional).
+
+### ✔ How to make the entire request path fully non-blocking?
+
+You would need to:
+1. Remove `spring-boot-starter-web`
+2. Use only `spring-boot-starter-webflux`
+3. Switch from Tomcat → Netty
+4. Rewrite controllers to return `Mono<FxQualResp>`
+
+### ✔ What you have today (best for 99% of enterprises)
+
+**Hybrid model:**
+
+| Part | Technology | Blocking? |
+|------|------------|-----------|
+| Inbound Web Server | Tomcat | Yes |
+| Outbound HTTP (WebClient) | Netty | No |
+| Business Logic | Yours | Depends |
+| DB (R2DBC) | Yes (non-blocking) | No |
+
+This is **realistic and extremely common**.  
+It matches **Fortune 100** microservice patterns — most teams do NOT fully switch to Netty.
 
 ---
 
@@ -212,10 +251,11 @@ curl -X POST "http://localhost:8080/api/fx/qualify?clientType=web_client"   -H "
 # Summary
 
 This repository is a **complete production blueprint** for:
+
 - comparing blocking vs reactive strategies
-- understanding JVM, threads, GC and connection pools
+- understanding JVM, threads, GC, pools
 - evaluating microservice efficiency at scale
-- observing SRE-grade metrics and golden signals
-- running deterministic downstream mocks
-- enabling deep analysis for senior Java engineers  
+- observing SRE-grade Golden Signals
+- deterministic testing using WireMock
+- deep performance analysis for senior Java engineers  
 
