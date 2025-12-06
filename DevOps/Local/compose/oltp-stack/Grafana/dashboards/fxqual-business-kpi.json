@@ -1,0 +1,55 @@
+{
+  "title": "FX Qual – Business KPIs",
+  "uid": "fxqual-business",
+  "schemaVersion": 39,
+  "tags": ["business", "fxqual"],
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Quotes Requested (per min)",
+      "gridPos": {"x":0,"y":0,"w":6,"h":4},
+      "datasource": "Prometheus",
+      "targets": [{
+        "expr": "sum(rate(fxqual_quotes_requested_total[1m]))"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Quotes Qualified (per min)",
+      "gridPos": {"x":6,"y":0,"w":6,"h":4},
+      "datasource": "Prometheus",
+      "targets": [{
+        "expr": "sum(rate(fxqual_quotes_qualified_total[1m]))"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Volume by Currency Pair",
+      "gridPos": {"x":0,"y":4,"w":12,"h":8},
+      "datasource": "Prometheus",
+      "targets": [{
+        "expr": "sum(rate(fxqual_volume_notional[1m])) by (pair)"
+      }]
+    },
+    {
+      "type": "graph",
+      "title": "Promo Usage",
+      "gridPos": {"x":12,"y":4,"w":12,"h":8},
+      "datasource": "Prometheus",
+      "targets": [{
+        "expr": "sum(rate(fxqual_promo_usage_total[1m])) by (promo)"
+      }]
+    },
+    {
+      "type": "piechart",
+      "title": "Channel Distribution",
+      "gridPos": {"x":0,"y":12,"w":24,"h":10},
+      "datasource": "Prometheus",
+      "targets": [{
+        "expr": "sum(rate(fxqual_channel_requests_total[1m])) by (channel)"
+      }]
+    }
+  ]
+}

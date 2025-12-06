@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+
+  fx-qual-zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: fx-qual-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - fxqual-local-net
+    volumes:
+      - fxqual-zk-data:/var/lib/zookeeper/data
+
+  fx-qual-kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: fx-qual-kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+
+      # Zookeeper connection
+      KAFKA_ZOOKEEPER_CONNECT: "fx-qual-zookeeper:2181"
+
+      # Listener definitions
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: |
+        INTERNAL:PLAINTEXT,
+        EXTERNAL:PLAINTEXT
+
+      # INTERNAL → containers inside Docker network
+      KAFKA_LISTENERS: |
+        INTERNAL://fx-qual-kafka:29092,
+        EXTERNAL://0.0.0.0:9092
+
+      # ADVERTISED: what clients see
+      KAFKA_ADVERTISED_LISTENERS: |
+        INTERNAL://fx-qual-kafka:29092,
+        EXTERNAL://localhost:9092
+
+      # Required for new Kafka versions
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+    depends_on:
+      - fx-qual-zookeeper
+
+    networks:
+      - fxqual-local-net
+
+    volumes:
+      - fxqual-kafka-data:/var/lib/kafka/data
+
+volumes:
+  fxqual-kafka-data:
+  fxqual-zk-data:
+
+networks:
+  fxqual-local-net:
+    driver: bridge

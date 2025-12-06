@@ -1,0 +1,48 @@
+{
+  "title": "FX Qual – JVM Metrics",
+  "uid": "fxqual-jvm",
+  "schemaVersion": 39,
+  "tags": ["jvm", "fxqual"],
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Heap Memory",
+      "datasource": "Prometheus",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "jvm_memory_used_bytes{area=\"heap\",service=\"fx-qual-engine\"}", "legendFormat": "Used" },
+        { "expr": "jvm_memory_max_bytes{area=\"heap\",service=\"fx-qual-engine\"}", "legendFormat": "Max" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "GC Pause Duration",
+      "datasource": "Prometheus",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "rate(jvm_gc_pause_seconds_sum{service=\"fx-qual-engine\"}[1m])", "legendFormat": "Pause time (s)" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Thread Count",
+      "datasource": "Prometheus",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "jvm_threads_live_threads{service=\"fx-qual-engine\"}", "legendFormat": "Live Threads" },
+        { "expr": "jvm_threads_daemon_threads{service=\"fx-qual-engine\"}", "legendFormat": "Daemon Threads" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Class Loading",
+      "datasource": "Prometheus",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "jvm_classes_loaded_classes{service=\"fx-qual-engine\"}", "legendFormat": "Loaded Classes" }
+      ]
+    }
+  ]
+}

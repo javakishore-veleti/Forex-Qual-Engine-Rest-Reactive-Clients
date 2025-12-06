@@ -1,0 +1,52 @@
+{
+  "id": null,
+  "uid": "fxqual-latency-compare",
+  "title": "HTTP Client Strategy – Latency Comparison",
+  "tags": ["fxqual", "otel", "latency"],
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "p95 Latency – RestClient vs RestTemplate vs WebClient",
+      "datasource": "Prometheus",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 10 },
+      "targets": [
+        {
+          "legendFormat": "RestClient",
+          "expr": "histogram_quantile(0.95, sum(rate(http_client_requests_seconds_bucket{client=\"rest_client\"}[5m])) by (le))"
+        },
+        {
+          "legendFormat": "RestTemplate",
+          "expr": "histogram_quantile(0.95, sum(rate(http_client_requests_seconds_bucket{client=\"rest_template\"}[5m])) by (le))"
+        },
+        {
+          "legendFormat": "WebClient",
+          "expr": "histogram_quantile(0.95, sum(rate(http_client_requests_seconds_bucket{client=\"web_client\"}[5m])) by (le))"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Throughput – Requests per Second",
+      "datasource": "Prometheus",
+      "gridPos": { "x": 0, "y": 10, "w": 24, "h": 10 },
+      "targets": [
+        {
+          "legendFormat": "RestClient",
+          "expr": "sum(rate(http_client_requests_seconds_count{client=\"rest_client\"}[1m]))"
+        },
+        {
+          "legendFormat": "RestTemplate",
+          "expr": "sum(rate(http_client_requests_seconds_count{client=\"rest_template\"}[1m]))"
+        },
+        {
+          "legendFormat": "WebClient",
+          "expr": "sum(rate(http_client_requests_seconds_count{client=\"web_client\"}[1m]))"
+        }
+      ]
+    }
+  ]
+}

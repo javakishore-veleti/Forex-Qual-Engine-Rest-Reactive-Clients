@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  fx-qual-postgres:
+    image: postgres:16
+    container_name: fx-qual-postgres
+    environment:
+      POSTGRES_USER: fxuser
+      POSTGRES_PASSWORD: fxpass
+      POSTGRES_DB: fxdb
+
+      # Allow connections from anywhere — essential for tools, tests, and multi-host dev
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - fxqual-postgres-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    # Important: health check so Spring Boot waits for DB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fxuser -d fxdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+    networks:
+      - fxqual-local-net
+
+volumes:
+  fxqual-postgres-data:
+
+networks:
+  fxqual-local-net:
+    driver: bridge

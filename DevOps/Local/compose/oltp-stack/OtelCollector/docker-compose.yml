@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  fx-qual-otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.101.0
+    container_name: fx-qual-otel-collector
+
+    command: ["--config=/etc/otel-collector-config.yml"]
+
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+      - "8888:8888" # Prometheus exporter (optional, recommended)
+
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:13133/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - fxqual-local-net
+
+networks:
+  fxqual-local-net:
+    driver: bridge

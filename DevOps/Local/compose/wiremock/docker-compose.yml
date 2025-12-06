@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  fx-qual-wiremock:
+    image: wiremock/wiremock:3.6.0
+    container_name: fx-qual-wiremock
+
+    ports:
+      # Expose WireMock on 8081 externally
+      - "8081:8080"
+
+    volumes:
+      # Stubs and responses
+      - ./mappings:/home/wiremock/mappings
+      - ./__files:/home/wiremock/__files
+
+    environment:
+      # Enables CORS → required for WebClient, RestClient demos
+      WIREMOCK_ENABLE_CORS: "true"
+      WIREMOCK_VERBOSE: "true"
+
+    networks:
+      - fxqual-local-net
+
+networks:
+  fxqual-local-net:
+    driver: bridge

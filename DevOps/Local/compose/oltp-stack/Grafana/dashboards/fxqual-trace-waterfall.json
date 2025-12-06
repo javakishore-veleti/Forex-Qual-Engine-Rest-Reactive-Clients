@@ -1,0 +1,32 @@
+{
+  "id": null,
+  "uid": "fxqual-trace-waterfall",
+  "title": "FX Qual – Trace Waterfall",
+  "tags": ["fxqual", "otel", "traces"],
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "traces",
+      "title": "Search Traces",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 10 },
+      "datasource": "Tempo",
+      "query": {
+        "queryType": "search",
+        "serviceName": "fx-qual-engine"
+      }
+    },
+    {
+      "type": "traces",
+      "title": "Trace Waterfall",
+      "gridPos": { "x": 0, "y": 10, "w": 24, "h": 20 },
+      "datasource": "Tempo",
+      "options": {
+        "showBars": true,
+        "showLabels": true
+      }
+    }
+  ]
+}

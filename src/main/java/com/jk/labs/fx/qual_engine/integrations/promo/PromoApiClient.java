@@ -5,5 +5,5 @@ import com.jk.labs.fx.qual_engine.integrations.product.ProductApiResp;
 
 public interface PromoApiClient {
 
-    ProductApiResp validateFxPromoCodes(FxQualExecCtx fxQualExecCtx);
+    PromoApiResp validateFxPromoCodes(FxQualExecCtx fxQualExecCtx);
 }

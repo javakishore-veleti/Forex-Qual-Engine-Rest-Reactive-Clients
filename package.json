@@ -1,3 +1,24 @@
 {
+  "name": "fx-qual-engine-devops",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local Docker orchestration for Forex-Qual-Engine-Rest-Reactive-Clients",
+  "scripts": {
+    "local-docker:up": "sh ./DevOps/Local/docker-up.sh",
+    "local-docker:down": "sh ./DevOps/Local/docker-down.sh",
+    "local-docker:status": "sh ./DevOps/Local/docker-status.sh",
 
+    "local-docker:kafka:logs": "docker logs -f local-kafka",
+    "local-docker:postgres:logs": "docker logs -f local-postgres",
+    "local-docker:wiremock:logs": "docker logs -f local-wiremock",
+
+    "local-app:run": "mvn spring-boot:run -Dspring-boot.run.profiles=local",
+    "local-app:build": "mvn clean package -DskipTests",
+    "local-app:test": "mvn test",
+
+    "local-docker:build": "mvn spring-boot:build-image",
+    "local-docker:run": "docker run -p 8080:8080 fx-qual-engine",
+
+    "help": "echo \"Commands: local-docker:up | local-docker:down | local-docker:status | local-docker:kafka:logs\""
+  }
 }

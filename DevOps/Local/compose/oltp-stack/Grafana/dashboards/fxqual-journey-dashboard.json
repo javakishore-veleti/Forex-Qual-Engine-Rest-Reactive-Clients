@@ -1,0 +1,38 @@
+{
+  "title": "FX Qual – End-to-End Journey",
+  "uid": "fxqual-journey",
+  "schemaVersion": 39,
+  "tags": ["journey", "fxqual", "otel"],
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "traces",
+      "title": "Trace Search",
+      "gridPos": {"x":0,"y":0,"w":24,"h":10},
+      "datasource": "Tempo",
+      "query": {
+        "queryType": "search",
+        "serviceName": "fx-qual-engine"
+      }
+    },
+    {
+      "type": "traces",
+      "title": "End-to-End Waterfall",
+      "gridPos": {"x":0,"y":10,"w":24,"h":18},
+      "datasource": "Tempo",
+      "options": { "showBars": true }
+    },
+    {
+      "type": "graph",
+      "title": "Service Hop Latency (Customer → Promo → Product → FX)",
+      "gridPos": {"x":0,"y":28,"w":24,"h":10},
+      "datasource": "Prometheus",
+      "targets": [
+        { "expr": "sum(rate(http_client_requests_seconds_count{endpoint=\"customer-service\"}[5m]))", "legendFormat": "Customer" },
+        { "expr": "sum(rate(http_client_requests_seconds_count{endpoint=\"promo-service\"}[5m]))", "legendFormat": "Promo" },
+        { "expr": "sum(rate(http_client_requests_seconds_count{endpoint=\"product-service\"}[5m]))", "legendFormat": "Product Catalog" }
+      ]
+    }
+  ]
+}

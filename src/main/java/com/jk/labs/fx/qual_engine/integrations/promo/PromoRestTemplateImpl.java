@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class PromoRestTemplateImpl implements PromoApiClient {
 
     @Override
-    public ProductApiResp validateFxPromoCodes(FxQualExecCtx ctx) {
-        return new ProductApiResp();
+    public PromoApiResp validateFxPromoCodes(FxQualExecCtx ctx) {
+        return new PromoApiResp();
     }
 }
