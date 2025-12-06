@@ -1,6 +1,0 @@
-{
-  "bookId": "FX-BOOK-1",
-  "riskCategory": "LOW",
-  "region": "GLOBAL",
-  "permissions": ["SPOT", "FORWARDS"]
-}
