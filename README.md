@@ -64,7 +64,7 @@ This repo is designed to showcase the KPIs, SLIs, SLOs, and saturation metrics a
 ### **1. Client Strategy Latency Comparison Dashboard**
 - Client Strategy means RestTemplate vs RestClient vs WebClient 
 - p50, p90, p95, p99, p999 for RestTemplate / RestClient / WebClient
-- Dimensions: URI, HTTP method, status code, downstream service
+- Dimensions: URI, HTTP method, status code, downstream service (read more below on dimensions)
 
 ### **2. Resource Saturation Dashboard**
 - Tomcat thread pool:
@@ -92,6 +92,277 @@ From recording rules:
 - Promo / Customer / Product / Market latency
 - Downstream error rates
 - Cascading failures
+
+
+Read more below on dimensions mentioned above
+
+#### Dimensions Notes for Client Strategy Latency Comparison
+
+This document explains the **four key dimensions** used in the *Client Strategy Latency Comparison Dashboard* and how each dimension maps to **Prometheus**, **Grafana**, **Jaeger**, and the **OpenTelemetry Collector**.
+
+---
+
+# 1. URI Dimension
+
+## What It Represents
+The API endpoint being invoked, such as `/api/fx/qualify`, `/customer/{id}`, `/promo/{code}`.
+
+---
+
+## Prometheus
+Micrometer exposes URI as a low-cardinality label:
+
+```
+http_server_requests_seconds_bucket{uri="/api/fx/qualify", ...}
+```
+
+✔ Prometheus automatically normalizes URI templates  
+✔ Prevents metric cardinality explosion
+
+---
+
+## Grafana
+Use URI as a dashboard variable:
+
+```
+label_values(http_server_requests_seconds_count, uri)
+```
+
+Recommended panels:
+- Latency per URI
+- Throughput per URI
+- Error rate per URI
+
+---
+
+## Jaeger
+Span attribute:
+
+```
+http.target = "/api/fx/qualify"
+```
+
+Useful for:
+- Filtering traces by endpoint
+- Comparing RestTemplate vs RestClient vs WebClient behavior
+
+---
+
+## OpenTelemetry Collector
+Pass-through attribute:
+
+```
+attributes:
+  - key: http.target
+```
+
+You may extend or rename these attributes before exporting.
+
+---
+
+# 2. HTTP Method Dimension
+
+## What It Represents
+The HTTP verb associated with the request (GET, POST, PUT, DELETE).
+
+---
+
+## Prometheus
+Micrometer exposes method label:
+
+```
+http_server_requests_seconds_count{method="POST"}
+```
+
+---
+
+## Grafana
+Use as a variable:
+
+```
+label_values(http_server_requests_seconds_count, method)
+```
+
+Useful for:
+- Latency by method
+- Error rate by method
+- Distinguishing heavy POST workloads vs light GET calls
+
+---
+
+## Jeager
+Span attribute:
+
+```
+http.method = "POST"
+```
+
+Allows SREs and developers to:
+- Filter traces for slow POST downstream calls
+- Compare blocking vs reactive performance
+- Identify retry behaviors
+
+---
+
+## OpenTelemetry Collector
+Method forwarded automatically:
+
+```
+attributes:
+  - key: http.method
+```
+
+Can be enriched or transformed for consistency.
+
+---
+
+# 3. Status Code Dimension
+
+## What It Represents
+HTTP response status code (200, 400, 500).
+
+---
+
+## Prometheus
+Captured in:
+
+```
+http_server_requests_seconds_count{status="200"}
+```
+
+Recommended queries:
+- `rate(...{status=~"5.."}[5m])` → server errors
+- `rate(...{status=~"4.."}[5m])` → client errors
+
+---
+
+## Grafana
+Create panels:
+- Error rate over time
+- Error heatmap grouped by status
+
+Variable example:
+
+```
+label_values(http_server_requests_seconds_count, status)
+```
+
+---
+
+## Jaeger
+Span attribute:
+
+```
+http.status_code = 500
+```
+
+Useful for:
+- Tracing root cause of 4xx/5xx
+- Error correlation with downstream calls
+- Latency vs status comparisons
+
+---
+
+## OpenTelemetry Collector
+Forwarded as-is:
+
+```
+attributes:
+  - key: http.status_code
+```
+
+Useful for routing:
+- send 5xx traces to separate pipeline
+- sample errors aggressively
+
+---
+
+# 4. Downstream Service Dimension
+
+## What It Represents
+The external system called in the workflow, e.g.:
+
+- `customer-service`
+- `promo-service`
+- `product-service`
+- `market-service`
+
+---
+
+## Prometheus
+Captured using custom metrics or via WebClient instrumentation:
+
+```
+http_client_requests_seconds_bucket{clientName="promo-service"}
+```
+
+You can also add:
+```
+downstream="customer-service"
+```
+
+---
+
+## Grafana
+Recommended dashboards:
+- Latency per downstream
+- Error ratio per downstream
+- Comparison of RestTemplate vs RestClient vs WebClient for each dependency
+
+Query variable:
+
+```
+label_values(http_client_requests_seconds_count, clientName)
+```
+
+---
+
+## Jaeger
+Span attributes:
+
+```
+peer.service = "promo-service"
+net.peer.name = "customer-service"
+```
+
+Provides:
+- Full dependency map
+- Latency per downstream hop
+- Comparing blocking vs non-blocking downstream behavior
+
+---
+
+## OpenTelemetry Collector
+Dependency metadata is preserved:
+
+```
+attributes:
+  - key: peer.service
+```
+
+Can be used for:
+- routing traces per downstream
+- exporting specific services to specialized backends
+
+---
+
+# Summary
+
+This document provides a production-ready breakdown of the **four primary dimensions** used in latency and performance analysis:
+
+- **URI**
+- **HTTP Method**
+- **Status Code**
+- **Downstream Service**
+
+Each dimension is mapped clearly to:
+- Prometheus labels
+- Grafana dashboards
+- Jaeger tracing fields
+- OTel Collector attributes
+
+This enables deep observability and expert-level SRE diagnostics.
+
 
 ---
 
