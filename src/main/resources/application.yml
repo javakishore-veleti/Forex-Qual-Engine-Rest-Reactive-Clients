@@ -17,29 +17,16 @@ integrations:
 
 logging:
   level:
-    root: DEBUG
-    io.opentelemetry: DEBUG
-    org.springframework.boot.actuate.autoconfigure.opentelemetry: DEBUG
+    root: INFO
+    io.opentelemetry: INFO
+    org.springframework.boot.actuate.autoconfigure.opentelemetry: INFO
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health, info, prometheus
 
-  tracing:
-    enabled: true
-    sampling:
-      probability: 1.0
-    propagation:
-      type: w3c
-    export:
-      enabled: true
-      otlp:
-        endpoint: http://localhost:24318/v1/traces
-
-  otlp:
-    metrics:
-      export:
-        enabled: true
-        url: http://localhost:24318/v1/metrics
+  metrics:
+    tags:
+      service: fx-qual-engine

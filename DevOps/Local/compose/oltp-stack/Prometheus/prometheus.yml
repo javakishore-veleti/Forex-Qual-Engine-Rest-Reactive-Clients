@@ -1,2 +1,12 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
 rule_files:
-  - "recording_rules.yml"
+  - "/etc/prometheus/recording_rules.yml"
+
+scrape_configs:
+  - job_name: "fxqual-engine"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets: ["host.docker.internal:8080"]

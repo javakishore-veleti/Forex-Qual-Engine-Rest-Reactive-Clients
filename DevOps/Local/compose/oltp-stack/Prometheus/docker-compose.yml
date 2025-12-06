@@ -1,16 +1,17 @@
-
-
 services:
-  local-prometheus:
-    image: prom/prometheus:v2.53.0
-    container_name: local-prometheus
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fxqual-prometheus
+    restart: always
+    networks:
+      - fxqual-local-net
     ports:
       - "9090:9090"
     volumes:
-      - fxqual-prometheus-data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    networks:
-      - fxqual-local-net
+      - ./recording_rules.yml:/etc/prometheus/recording_rules.yml
+      - fxqual-prometheus-data:/prometheus
 
 volumes:
   fxqual-prometheus-data:

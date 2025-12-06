@@ -1,12 +1,16 @@
 groups:
-  - name: fxqual_latency_rules
+  - name: fxqual_server_latency
     interval: 30s
     rules:
-
-      # p50, p95, p99 latency for FX Qual REST API
       - record: fxqual:http_server_latency_p50
         expr: histogram_quantile(
           0.50,
+          sum(rate(http_server_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (le)
+          )
+
+      - record: fxqual:http_server_latency_p90
+        expr: histogram_quantile(
+          0.90,
           sum(rate(http_server_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (le)
           )
 
@@ -22,43 +26,125 @@ groups:
           sum(rate(http_server_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (le)
           )
 
-      # p95 per client strategy (RestClient vs RestTemplate vs WebClient)
+      - record: fxqual:http_server_latency_p999
+        expr: histogram_quantile(
+          0.999,
+          sum(rate(http_server_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (le)
+          )
+
+  - name: fxqual_endpoint_latency
+    interval: 20s
+    rules:
+      - record: fxqual:http_server_latency_p95_by_uri
+        expr: histogram_quantile(
+          0.95,
+          sum(rate(http_server_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (uri, le)
+          )
+
+  - name: fxqual_client_latency
+    interval: 30s
+    rules:
       - record: fxqual:http_client_latency_p95
         expr: histogram_quantile(
           0.95,
           sum(rate(http_client_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (client, le)
           )
 
-  - name: fxqual_kpi_rules
+      - record: fxqual:http_client_latency_p99
+        expr: histogram_quantile(
+          0.99,
+          sum(rate(http_client_requests_seconds_bucket{service="fx-qual-engine"}[5m])) by (client, le)
+          )
+
+      - record: fxqual:http_client_rps
+        expr: sum(rate(http_client_requests_seconds_count{service="fx-qual-engine"}[1m])) by (client)
+
+      - record: fxqual:http_client_errors
+        expr: sum(rate(http_client_requests_seconds_count{service="fx-qual-engine",status!~"2.."}[5m])) by (client)
+
+  - name: fxqual_saturation
+    interval: 15s
+    rules:
+      - record: fxqual:executor_active_threads
+        expr: sum(jvm_threads_states_threads{state="runnable"})
+
+      - record: fxqual:tomcat_busy_threads
+        expr: sum(tomcat_threads_busy)
+
+      - record: fxqual:tomcat_connection_usage
+        expr: sum(tomcat_connections_current) / sum(tomcat_connections_max)
+
+      - record: fxqual:webclient_pending_requests
+        expr: sum(reactor_netty_request_pending)
+
+  - name: fxqual_jvm_gc
+    interval: 30s
+    rules:
+      - record: fxqual:jvm_gc_pause_p99
+        expr: histogram_quantile(
+          0.99,
+          sum(rate(jvm_gc_pause_seconds_bucket[5m])) by (le)
+          )
+
+      - record: fxqual:jvm_allocation_rate
+        expr: rate(jvm_memory_allocated_bytes_total[1m])
+
+  - name: fxqual_kpis
     interval: 1m
     rules:
-
-      # Quotes per minute
       - record: fxqual:quotes_requested_per_min
         expr: sum(rate(fxqual_quotes_requested_total[1m]))
 
       - record: fxqual:quotes_qualified_per_min
         expr: sum(rate(fxqual_quotes_qualified_total[1m]))
 
-      # Notional volume aggregation
       - record: fxqual:volume_by_pair
         expr: sum(rate(fxqual_volume_notional[1m])) by (pair)
 
-      # Promo usage
       - record: fxqual:promo_usage_by_code
         expr: sum(rate(fxqual_promo_usage_total[1m])) by (promo)
 
-  - name: fxqual_sre_golden_signals
+  - name: fxqual_golden_signals
     interval: 30s
     rules:
-      # Request rate
       - record: fxqual:request_rate
         expr: sum(rate(http_server_requests_seconds_count{service="fx-qual-engine"}[1m]))
 
-      # Error percentage
       - record: fxqual:error_rate_percent
         expr: |
-          sum(rate(http_server_requests_seconds_count{service="fx-qual-engine",status!~"2.."}[1m]))
-          /
-          sum(rate(http_server_requests_seconds_count{service="fx-qual-engine"}[1m]))
-          * 100
+          (
+            sum(rate(http_server_requests_seconds_count{service="fx-qual-engine",status!~"2.."}[1m]))
+            /
+            sum(rate(http_server_requests_seconds_count{service="fx-qual-engine"}[1m]))
+          ) * 100
+
+  - name: fxqual_slo_burn
+    interval: 30s
+    rules:
+      - record: fxqual:burnrate_fast
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{service="fx-qual-engine",status!~"2.."}[5m]))
+            /
+            sum(rate(http_server_requests_seconds_count{service="fx-qual-engine"}[5m]))
+          )
+
+      - record: fxqual:burnrate_slow
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{service="fx-qual-engine",status!~"2.."}[1h]))
+            /
+            sum(rate(http_server_requests_seconds_count{service="fx-qual-engine"}[1h]))
+          )
+
+  - name: fxqual_scaling
+    interval: 20s
+    rules:
+      - record: fxqual:cpu_saturation
+        expr: system_cpu_usage
+
+      - record: fxqual:memory_usage_percent
+        expr: jvm_memory_used_bytes / jvm_memory_max_bytes
+
+      - record: fxqual:thread_saturation
+        expr: jvm_threads_live_threads / jvm_threads_peak_threads
