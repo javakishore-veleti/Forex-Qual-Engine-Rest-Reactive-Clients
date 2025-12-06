@@ -1,16 +1,14 @@
-
-
 services:
   fx-qual-otel-collector:
     image: otel/opentelemetry-collector-contrib:0.101.0
     container_name: fx-qual-otel-collector
-
     command: ["--config=/etc/otel-collector-config.yml"]
 
     ports:
-      - "24317:4317"   # OTLP gRPC receiver
-      - "24318:4318"   # OTLP HTTP receiver
-      - "24388:8888"   # Prometheus exporter
+      - "24317:4317"
+      - "24318:4318"
+      - "24333:13133"   # FIXED - healthcheck port
+      - "24388:8888"
 
     volumes:
       - ./otel-collector-config.yml:/etc/otel-collector-config.yml
