@@ -1,14 +1,15 @@
 {
-  "bookDetails": [
-    {{#each (jsonPath request.body '$.bookIds')}}
-    {
-      "bookId": "{{this}}",
-      "riskCategory": "{{#ifeq this 'BOOK-HIGH'}}HIGH{{else}}LOW{{/ifeq}}",
-      "limits": {
-        "min": {{#ifeq this 'BOOK-HIGH'}}1000000{{else}}10000{{/ifeq}},
-    "max": {{#ifeq this 'BOOK-HIGH'}}50000000{{else}}5000000{{/ifeq}}
-  }
-  }{{#unless @last}},{{/unless}}
-    {{/each}}
-  ]
+  "requestedBookIds": {{jsonPath request.body '$.bookIds'}},
+"validBookIds": {{jsonPath request.body '$.bookIds'}},
+"invalidBookIds": [],
+"bookDetails": [
+{{#each (jsonPath request.body '$.bookIds')}}
+{
+"bookId": "{{this}}",
+"productType": "FX-SPOT",
+"riskCategory": "LOW",
+"limits": { "min": 10000, "max": 5000000 }
+}{{#unless @last}},{{/unless}}
+{{/each}}
+]
 }

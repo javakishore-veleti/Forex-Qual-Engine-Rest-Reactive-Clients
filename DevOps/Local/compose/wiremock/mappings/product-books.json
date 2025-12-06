@@ -1,14 +1,14 @@
 {
   "request": {
-    "method": "POST",
-    "url": "/api/product/books"
+    "url": "/api/product/books",
+    "method": "POST"
   },
   "response": {
     "status": 200,
+    "bodyFileName": "product-books-smart.json",
     "transformers": ["response-template"],
     "headers": {
       "Content-Type": "application/json"
-    },
-    "body": "{\n  \"requestedBookIds\": {{jsonPath request.body '$.bookIds'}},\n  \"validBookIds\": {{jsonPath request.body '$.bookIds'}},\n  \"invalidBookIds\": [],\n  \"bookDetails\": [\n    {{#each (jsonPath request.body '$.bookIds')}}\n    {\n      \"bookId\": \"{{this}}\",\n      \"productType\": \"FX-SPOT\",\n      \"riskCategory\": \"LOW\",\n      \"limits\": {\n        \"min\": 10000,\n        \"max\": 5000000\n      }\n    }{{#unless @last}},{{/unless}}\n    {{/each}}\n  ]\n}"
+    }
   }
 }

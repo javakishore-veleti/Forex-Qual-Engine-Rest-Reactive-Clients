@@ -1,0 +1,6 @@
+{
+  "fromCurrency": "{{request.pathSegments.[3]}}",
+  "toCurrency": "{{request.pathSegments.[4]}}",
+  "spotRate": {{randomFloat min=0.5 max=1.5 format='0.0000'}},
+"timestamp": "{{now format='yyyy-MM-dd HH:mm:ss'}}"
+}

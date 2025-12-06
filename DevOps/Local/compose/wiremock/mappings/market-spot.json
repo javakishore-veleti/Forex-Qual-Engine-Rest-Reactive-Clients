@@ -1,14 +1,14 @@
 {
   "request": {
-    "method": "GET",
-    "urlPattern": "/api/market/spot/([A-Za-z]{3})/([A-Za-z]{3})"
+    "urlPattern": "/api/market/spot/([A-Za-z]{3})/([A-Za-z]{3})",
+    "method": "GET"
   },
   "response": {
     "status": 200,
+    "bodyFileName": "market-spot-response.json",
     "transformers": ["response-template"],
     "headers": {
       "Content-Type": "application/json"
-    },
-    "body": "{\n  \"fromCurrency\": \"{{request.pathSegments.[3]}}\",\n  \"toCurrency\": \"{{request.pathSegments.[4]}}\",\n  \"spotRate\": {{randomFloat min=0.5 max=1.5 format='0.0000'}},\n  \"timestamp\": \"{{now format='yyyy-MM-dd HH:mm:ss'}}\"\n}"
+    }
   }
 }

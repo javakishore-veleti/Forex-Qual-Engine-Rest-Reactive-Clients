@@ -1,0 +1,6 @@
+{
+  "bookId": "{{request.pathSegments.[2]}}",
+  "desk": "G10-FX",
+  "maxQuoteSize": 10000000,
+  "permissions": ["SPOT", "FORWARDS", "NDF"]
+}

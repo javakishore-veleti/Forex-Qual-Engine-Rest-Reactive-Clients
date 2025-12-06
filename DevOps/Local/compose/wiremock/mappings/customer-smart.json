@@ -1,15 +1,15 @@
 {
-  "priority": 20,
+  "priority": 10,
   "request": {
-    "method": "GET",
-    "urlPattern": "/api/customer/([A-Za-z0-9\\-]+)"
+    "urlPattern": "/api/customer/([A-Za-z0-9\\-]+)",
+    "method": "GET"
   },
   "response": {
     "status": 200,
-    "body": "{\n  \"customerId\": \"{{request.pathSegments.[2]}}\",\n  \"customerName\": \"Customer {{request.pathSegments.[2]}}\",\n  \"customerEmail\": \"{{request.pathSegments.[2]}}@example.com\",\n  \"customerStatus\": \"ACTIVE\"\n}",
+    "bodyFileName": "customer-smart-response.json",
+    "transformers": ["response-template"],
     "headers": {
       "Content-Type": "application/json"
-    },
-    "transformers": ["response-template"]
+    }
   }
 }
