@@ -27,6 +27,9 @@
     "local-docker:build": "mvn spring-boot:build-image",
     "local-docker:run": "docker run -p 8080:8080 fx-qual-engine",
 
+    "local-postman:prometheus-collection": "open ./Testing/Postman/Prometheus_FXQualEngine.postman_collection.json || xdg-open ./Testing/Postman/Prometheus_FXQualEngine.postman_collection.json || start ./source_repo/Testing/Postman/Prometheus_FXQualEngine.postman_collection.json",
+    "local-notebook:fxqual-analytics": "jupyter notebook ./Testing/Jupyter/FXQualEngine_Analytics_Notebook.ipynb",
+
     "help": "echo \"Commands: local-docker:up | local-docker:down | local-docker:status | local-docker:kafka:logs\""
   }
 }

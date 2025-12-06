@@ -80,7 +80,7 @@ public class GenericQualWFExecImpl<C extends CustomerApiClient,
             // 7️⃣ Stop workflow timer
             // ---------------------------------------------------------
             workflowSample.stop(
-                    Timer.builder("fxqual_workflow_total_ms")
+                    Timer.builder("fxqual_workflow_duration_ms")
                             .tag("clientImpl", clientImplName)
                             .register(metrics.getRegistry())
             );

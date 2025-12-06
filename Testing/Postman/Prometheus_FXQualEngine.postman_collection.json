@@ -1,0 +1,101 @@
+{
+  "info": {
+    "name": "Prometheus_FXQualEngine",
+    "_postman_id": "fxqual-prometheus-collection",
+    "description": "Postman collection for FX Qual Engine workflow + step metrics validation in Prometheus.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Qualify FX Quote (rest_client)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"CUST001\",\n  \"fromCurrency\": \"USD\",\n  \"toCurrency\": \"EUR\",\n  \"quantity\": 1000000,\n  \"promoCodes\": [\n    \"FX50\"\n  ],\n  \"productCodes\": [\n    \"FXSPOT\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/fx/qualify?clientType=rest_client",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "fx",
+            "qualify"
+          ],
+          "query": [
+            {
+              "key": "clientType",
+              "value": "rest_client"
+            }
+          ]
+        },
+        "description": "Invokes the FX Qualification workflow using the **RestClient** implementation.\n\n\ud83c\udfaf **This request triggers ALL Prometheus metrics:**\n- fxqual_workflow_duration_ms\n- fxqual_step_duration_ms{step=\"customer\"}\n- fxqual_step_duration_ms{step=\"promo\"}\n- fxqual_step_duration_ms{step=\"product\"}\n- fxqual_step_duration_ms{step=\"fxInterest\"}\n- fxqual_method_invocations_total\n- fxqual_quotes_requested_total\n- fxqual_quotes_qualified_total\n\nAfter executing this request, open:\n\ud83d\udc49 http://localhost:8080/actuator/prometheus\nand search for `fxqual_` to see your workflow + step metrics."
+      }
+    },
+    {
+      "name": "Qualify FX Quote (web_client)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerId\": \"CUST002\",\n  \"fromCurrency\": \"USD\",\n  \"toCurrency\": \"JPY\",\n  \"quantity\": 2000000,\n  \"promoCodes\": [],\n  \"productCodes\": [\n    \"FXFWD\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/fx/qualify?clientType=web_client",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "fx",
+            "qualify"
+          ],
+          "query": [
+            {
+              "key": "clientType",
+              "value": "web_client"
+            }
+          ]
+        },
+        "description": "Invoke FX Qualification using **WebClient** (reactive).\n\nUse this to compare latency against RestClient.\nPrometheus label will be:\n\n`fxqual_workflow_duration_ms{clientType=\"web_client\"}`\n\nUseful for benchmarking client strategy performance."
+      }
+    },
+    {
+      "name": "Prometheus Metrics Endpoint",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:8080/actuator/prometheus",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "actuator",
+            "prometheus"
+          ]
+        },
+        "description": "Opens the Prometheus metrics scrape endpoint.\n\nSearch inside the output for:\n- fxqual_workflow_duration_ms\n- fxqual_step_duration_ms\n- fxqual_method_invocations_total\n- fxqual_promo_usage_total\n- fxqual_volume_notional\n- http_server_requests_seconds\n"
+      }
+    }
+  ]
+}
