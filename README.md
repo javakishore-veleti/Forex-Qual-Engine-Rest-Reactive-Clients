@@ -62,6 +62,7 @@ This repo is designed to showcase the KPIs, SLIs, SLOs, and saturation metrics a
 ## Detailed SRE Dimensions & Dashboards
 
 ### **1. Client Strategy Latency Comparison Dashboard**
+- Client Strategy means RestTemplate vs RestClient vs WebClient 
 - p50, p90, p95, p99, p999 for RestTemplate / RestClient / WebClient
 - Dimensions: URI, HTTP method, status code, downstream service
 
