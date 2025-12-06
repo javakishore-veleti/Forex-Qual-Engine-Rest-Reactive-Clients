@@ -4,6 +4,7 @@ import com.jk.labs.fx.qual_engine.dto.FxQualExecCtx;
 import com.jk.labs.fx.qual_engine.integrations.FxQualClient;
 import com.jk.labs.fx.qual_engine.integrations.FxQualClientFactory;
 import com.jk.labs.fx.qual_engine.service.FxQualEngineFacade;
+import com.jk.labs.fx.qual_engine.util.QuoteRequestExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class FxQualEngineFacadeImpl implements FxQualEngineFacade {
 
     private final FxQualClientFactory clientFactory;
 
+    @QuoteRequestExecution
     @Override
     public int qualify(FxQualExecCtx ctx) {
         log.info("qualify: Starting with strategy client type {}", ctx.getClientType());
