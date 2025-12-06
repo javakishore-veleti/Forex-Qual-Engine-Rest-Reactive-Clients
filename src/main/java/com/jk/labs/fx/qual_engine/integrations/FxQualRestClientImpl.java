@@ -5,35 +5,36 @@ import com.jk.labs.fx.qual_engine.integrations.customer.CustomerRestClientImpl;
 import com.jk.labs.fx.qual_engine.integrations.market_data.FxInterestRestClientImpl;
 import com.jk.labs.fx.qual_engine.integrations.product.ProductRestClientImpl;
 import com.jk.labs.fx.qual_engine.integrations.promo.PromoRestClientImpl;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import static com.jk.labs.fx.qual_engine.util.AppConstants.ACT_SUCCESS;
 
 @Component("restClientStrategy")
 @RequiredArgsConstructor
-public class FxQualRestClientImpl implements FxQualClient {
+@Slf4j
+public class FxQualRestClientImpl extends GenericQualWFExecImpl<CustomerRestClientImpl, PromoRestClientImpl, ProductRestClientImpl, FxInterestRestClientImpl> implements FxQualClient {
 
     private final CustomerRestClientImpl customerClient;
     private final PromoRestClientImpl promoClient;
     private final ProductRestClientImpl productClient;
     private final FxInterestRestClientImpl fxInterestApiClient;
 
+    @PostConstruct
+    public void setup() {
+        super.setCustomerClient( customerClient);
+        super.setPromoClient( promoClient);
+        super.setProductClient( productClient);
+        super.setFxInterestApiClient( fxInterestApiClient);
+    }
+
     @Override
     public int qualify(FxQualExecCtx ctx) {
+        return super.qualifyWfExecution(ctx, clientImplName());
+    }
 
-        var customer = customerClient.validateCustomerId(ctx);
-        ctx.getQualResp().addCtxData("CustomerApiResp", customer);
-
-        var promo = promoClient.validateFxPromoCodes(ctx);
-        ctx.getQualResp().addCtxData("ProductApiResp", promo);
-
-        var product = productClient.getProductInfosByBookCodes(ctx);
-        ctx.getQualResp().addCtxData("ProductApiResp", product);
-
-        var rate = fxInterestApiClient.getMarketInterestForCurrencies(ctx);
-        ctx.getQualResp().addCtxData("FxInterestApiResp", rate);
-
-        return ACT_SUCCESS;
+    @Override
+    public String clientImplName() {
+        return "FxQualRestClientImpl";
     }
 }

@@ -3,7 +3,7 @@ package com.jk.labs.fx.qual_engine.api;
 import com.jk.labs.fx.qual_engine.dto.FxQualExecCtx;
 import com.jk.labs.fx.qual_engine.dto.FxQualReq;
 import com.jk.labs.fx.qual_engine.dto.FxQualResp;
-import com.jk.labs.fx.qual_engine.service.FxQualService;
+import com.jk.labs.fx.qual_engine.service.FxQualEngineFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class FxQualController {
 
-    private final FxQualService fxQualService;
+    private final FxQualEngineFacade fxQualEngineFacade;
 
     /**
      * Qualify an FX quote using the desired HTTP client strategy.
@@ -35,7 +35,7 @@ public class FxQualController {
         FxQualExecCtx ctx = new FxQualExecCtx();
         ctx.getQualResp().setClientType(clientType);
 
-        fxQualService.qualify(ctx);
+        fxQualEngineFacade.qualify(ctx);
 
         resp.setExecEndDateTime(new Date());
         resp.setEndTime(System.currentTimeMillis());
