@@ -62,10 +62,10 @@ public class FxQualMetrics {
     // --------------------------------------------------------------------
     // 3. **WORKFLOW TIMER** (new)
     // --------------------------------------------------------------------
-    public Timer workflowTimer(String clientType) {
+    public Timer workflowTimer(String clientImplName) {
         return Timer.builder("fxqual_workflow_duration_ms")
                 .description("Full workflow execution time")
-                .tag("clientType", clientType)
+                .tag("clientImpl", clientImplName)
                 .register(registry);
     }
 

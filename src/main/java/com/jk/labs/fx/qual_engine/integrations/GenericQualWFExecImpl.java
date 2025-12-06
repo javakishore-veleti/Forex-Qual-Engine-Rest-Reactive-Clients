@@ -31,43 +31,32 @@ public class GenericQualWFExecImpl<C extends CustomerApiClient,
     private FxQualMetrics metrics;
 
     public int qualifyWfExecution(FxQualExecCtx ctx, String clientImplName) {
+
         log.info("qualify: Starting clientImplName {}", clientImplName);
 
-        // ---------------------------------------------------------
-        // 1️⃣ Track invocation count
-        // ---------------------------------------------------------
+        // method invocation
         metrics.invocationCounter("GenericQualWFExecImpl.qualifyWfExecution").increment();
 
-        // ---------------------------------------------------------
-        // 2️⃣ Full workflow timer
-        // ---------------------------------------------------------
-        Timer.Sample workflowSample = Timer.start();
+        // WORKFLOW TIMER START
+        Timer.Sample workflowSample = Timer.start(metrics.getRegistry());
 
         try {
-            // ---------------------------------------------------------
-            // 3️⃣ Customer step timer
-            // ---------------------------------------------------------
+            // CUSTOMER STEP
             var customer = metrics.stepTimer("customer")
                     .record(() -> customerClient.validateCustomerId(ctx));
             ctx.getQualResp().addCtxData("CustomerApiResp", customer);
 
-            // ---------------------------------------------------------
-            // 4️⃣ Promo step timer
-            // ---------------------------------------------------------
+            // PROMO STEP
             var promo = metrics.stepTimer("promo")
                     .record(() -> promoClient.validateFxPromoCodes(ctx));
             ctx.getQualResp().addCtxData("PromoApiResp", promo);
 
-            // ---------------------------------------------------------
-            // 5️⃣ Product step timer
-            // ---------------------------------------------------------
+            // PRODUCT STEP
             var product = metrics.stepTimer("product")
                     .record(() -> productClient.getProductInfosByBookCodes(ctx));
             ctx.getQualResp().addCtxData("ProductApiResp", product);
 
-            // ---------------------------------------------------------
-            // 6️⃣ FX Interest Market Data timer
-            // ---------------------------------------------------------
+            // FX INTEREST STEP
             var rate = metrics.stepTimer("fxInterest")
                     .record(() -> fxInterestApiClient.getMarketInterestForCurrencies(ctx));
             ctx.getQualResp().addCtxData("FxInterestApiResp", rate);
@@ -76,13 +65,10 @@ public class GenericQualWFExecImpl<C extends CustomerApiClient,
             return ACT_SUCCESS;
 
         } finally {
-            // ---------------------------------------------------------
-            // 7️⃣ Stop workflow timer
-            // ---------------------------------------------------------
+
+            // WORKFLOW TIMER END
             workflowSample.stop(
-                    Timer.builder("fxqual_workflow_duration_ms")
-                            .tag("clientImpl", clientImplName)
-                            .register(metrics.getRegistry())
+                    metrics.workflowTimer(clientImplName)
             );
         }
     }

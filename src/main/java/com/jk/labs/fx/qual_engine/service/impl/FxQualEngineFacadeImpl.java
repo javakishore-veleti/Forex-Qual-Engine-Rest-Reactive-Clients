@@ -7,7 +7,6 @@ import com.jk.labs.fx.qual_engine.telemetry.OtelSpanUtil;
 import com.jk.labs.fx.qual_engine.telemetry.metrics.FxQualMetrics;
 import com.jk.labs.fx.qual_engine.service.FxQualEngineFacade;
 import com.jk.labs.fx.qual_engine.util.QuoteRequestExecution;
-import io.micrometer.core.instrument.Timer;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
@@ -31,35 +30,33 @@ public class FxQualEngineFacadeImpl implements FxQualEngineFacade {
     @QuoteRequestExecution
     @Override
     public int qualify(FxQualExecCtx ctx) {
+
         log.info("qualify: Starting with client type {}", ctx.getClientType());
 
-        // ---------------------------------------------------------
-        // NEW METRICS: method invocation + timer start
-        // ---------------------------------------------------------
+        // method invocation counter
         metrics.invocationCounter("FxQualEngineFacade.qualify").increment();
-        Timer.Sample sample = Timer.start();
-        // ---------------------------------------------------------
 
-        // ROOT SPAN (important!)
+        // ROOT SPAN
         Span root = tracer.spanBuilder("fxqual.qualify")
                 .setSpanKind(SpanKind.SERVER)
                 .startSpan();
 
         spanUtil.enrichRootSpan(root, ctx.getQualReq(), ctx.getQualResp().getClientType());
 
-        // makeCurrent() ensures all downstream spans become children
-        //noinspection unused
+        String strategyImplName = "<undefined>";
+
         try (var scope = root.makeCurrent()) {
 
             metrics.recordQuoteRequested();
 
-            // --- STRATEGY RESOLUTION ---
+            // Strategy resolution
             FxQualClient strategy = clientFactory.resolve(ctx.getClientType());
+            strategyImplName = strategy.clientImplName();
 
-            // --- ACTUAL QUAL EXECUTION ---
+            // Execute workflow
             int result = strategy.qualify(ctx);
 
-            // --- RECORD METRICS ---
+            // Record final business metrics
             var req = ctx.getQualReq();
             metrics.recordQuoteQualified();
             metrics.recordNotional(req.getFromCurrency() + req.getToCurrency(), req.getQuantity());
@@ -73,20 +70,15 @@ public class FxQualEngineFacadeImpl implements FxQualEngineFacade {
         } catch (Exception ex) {
             root.recordException(ex);
             root.setAttribute("fxqual.error", true);
-            log.error("qualify: Error during execution", ex);
+            log.error("qualify: Error during execution strategyImplName={}", strategyImplName, ex);
             throw ex;
+
         } finally {
 
-            // ---------------------------------------------------------
-            // NEW METRICS: stop timer (measure full duration)
-            // ---------------------------------------------------------
-            sample.stop(metrics.workflowTimer(ctx.getClientType()));
-            // ---------------------------------------------------------
-
-            // --- END ROOT SPAN ---
+            // END ROOT SPAN
             root.end();
 
-            // --- TIMINGS UPDATED HERE ---
+            // Set response times
             var resp = ctx.getQualResp();
             resp.setExecEndDateTime(new Date());
             resp.setEndTime(System.currentTimeMillis());
