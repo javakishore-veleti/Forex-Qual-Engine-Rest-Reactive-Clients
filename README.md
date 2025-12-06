@@ -103,7 +103,7 @@ This document explains the **four key dimensions** used in the *Client Strategy 
 
 #### 1. URI Dimension
 
-## What It Represents
+##### What It Represents
 The API endpoint being invoked, such as `/api/fx/qualify`, `/customer/{id}`, `/promo/{code}`.
 
 ---
@@ -161,7 +161,7 @@ You may extend or rename these attributes before exporting.
 
 #### 2. HTTP Method Dimension
 
-## What It Represents
+##### What It Represents
 The HTTP verb associated with the request (GET, POST, PUT, DELETE).
 
 ---
