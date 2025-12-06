@@ -98,7 +98,7 @@ From recording rules:
 
 Read more below on dimensions mentioned above
 
-#### <span style="color: blue;"><b>Dimensions Notes for Client Strategy Latency Comparison</b></span>
+#### 🔵 **Dimensions Notes for Client Strategy Latency Comparison**
 
 This document explains the **four key dimensions** used in the *Client Strategy Latency Comparison Dashboard* and how each dimension maps to **Prometheus**, **Grafana**, **Jaeger**, and the **OpenTelemetry Collector**.
 
@@ -369,7 +369,7 @@ This enables deep observability and expert-level SRE diagnostics.
 
 Read more below on dimensions mentioned above on "Resource Saturation Dashboard"
 
-#### Resource Saturation Dashboard — Human-Friendly Deep Explanation
+#### 🔵 **Resource Saturation Dashboard — Human-Friendly Deep Explanation**
 
 Saturation is one of the **Four Golden Signals of SRE** (Latency, Traffic, Errors, Saturation).  
 This dashboard helps teams understand **how close the service is to overload**, which directly affects latency, failures, and error budgets.
