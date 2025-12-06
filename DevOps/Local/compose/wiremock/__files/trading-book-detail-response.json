@@ -1,0 +1,7 @@
+{
+  "tradingBookId": "FX-SPOT-001",
+  "riskCategory": "LOW",
+  "desk": "G10 FX Spot",
+  "maxNotionalAllowed": 5000000,
+  "supportedPairs": ["EURUSD", "USDJPY", "GBPUSD"]
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/product/books"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "product-books-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

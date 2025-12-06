@@ -1,0 +1,19 @@
+{
+  "currency": "USD",
+  "currencyInterestInfos": [
+    {
+      "tenor": "ON",
+      "rate": 5.28
+    },
+    {
+      "tenor": "1W",
+      "rate": 5.25
+    },
+    {
+      "tenor": "1M",
+      "rate": 5.18
+    }
+  ],
+  "asOf": "2025-01-01T12:00:00Z",
+  "source": "WireMock-MarketData"
+}

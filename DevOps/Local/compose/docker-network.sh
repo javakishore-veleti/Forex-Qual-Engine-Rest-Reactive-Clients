@@ -5,28 +5,28 @@ NETWORK_NAME="fxqual-local-net"
 
 case "$1" in
   create)
-    echo "🔧 Creating Docker network: $NETWORK_NAME"
+    echo "Creating Docker network: $NETWORK_NAME"
     if docker network ls | grep -q "$NETWORK_NAME"; then
-      echo "ℹ️ Network already exists: $NETWORK_NAME"
+      echo "Network already exists: $NETWORK_NAME"
     else
       docker network create "$NETWORK_NAME"
-      echo "✅ Network created"
+      echo "Network created"
     fi
     ;;
 
   delete)
-    echo "🗑 Removing Docker network: $NETWORK_NAME"
+    echo "Removing Docker network: $NETWORK_NAME"
     if docker network ls | grep -q "$NETWORK_NAME"; then
       docker network rm "$NETWORK_NAME"
-      echo "✅ Network removed"
+      echo "Network removed"
     else
-      echo "⚠️ Network does not exist"
+      echo "Network does not exist"
     fi
     ;;
 
   status)
-    echo "📡 Network status:"
-    docker network ls | grep "$NETWORK_NAME" || echo "⚠️ Not created"
+    echo "Network status:"
+    docker network ls | grep "$NETWORK_NAME" || echo "Not created"
     ;;
 
   *)

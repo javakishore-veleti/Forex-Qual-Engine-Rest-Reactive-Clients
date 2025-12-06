@@ -12,36 +12,36 @@ VOLUMES=(
 
 case "$1" in
   create)
-    echo "📦 Creating Docker volumes..."
+    echo "Creating Docker volumes..."
     for vol in "${VOLUMES[@]}"; do
       if docker volume ls | grep -q "$vol"; then
-        echo "ℹ️ Exists: $vol"
+        echo "Exists: $vol"
       else
         docker volume create "$vol"
-        echo "✅ Created: $vol"
+        echo "Created: $vol"
       fi
     done
     ;;
 
   delete)
-    echo "🗑 Deleting FXQUAL Docker volumes..."
+    echo "Deleting FXQUAL Docker volumes..."
     for vol in "${VOLUMES[@]}"; do
       if docker volume ls | grep -q "$vol"; then
         docker volume rm "$vol"
-        echo "❌ Deleted: $vol"
+        echo "Deleted: $vol"
       else
-        echo "⚠️ Not found: $vol"
+        echo "Not found: $vol"
       fi
     done
     ;;
 
   prune)
-    echo "🧹 Pruning unused volumes..."
+    echo "Pruning unused volumes..."
     docker volume prune -f
     ;;
 
   status)
-    echo "📊 Volume status:"
+    echo "Volume status:"
     docker volume ls | grep fxqual || echo "⚠️ No FXQUAL volumes found"
     ;;
 

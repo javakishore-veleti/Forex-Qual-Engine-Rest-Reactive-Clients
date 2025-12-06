@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/market/spot",
+    "queryParameters": {
+      "pair": {
+        "matches": "^[A-Z]{6}$"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "market-spot-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
