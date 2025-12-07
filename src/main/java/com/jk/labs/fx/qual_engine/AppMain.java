@@ -8,5 +8,7 @@ public class AppMain {
 
     public static void main(String[] args) {
         SpringApplication.run(AppMain.class, args);
+        Thread.getAllStackTraces().keySet().forEach(t ->
+                System.out.println("Thread Name " + t.getName()));
     }
 }

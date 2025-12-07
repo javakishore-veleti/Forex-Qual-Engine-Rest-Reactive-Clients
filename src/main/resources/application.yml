@@ -30,3 +30,36 @@ management:
   metrics:
     tags:
       service: fx-qual-engine
+    enable:
+      jvm: true
+      process: true
+      tomcat: true
+      executor: true
+      logback: true
+      system: true
+      web: true
+      http.server.requests: true
+      http.server.requests.seconds: true
+      http.server.requests.seconds.max: true
+      http.server.requests.seconds.sum: true
+      http.server.requests.seconds.count: true
+      http.server.requests.seconds.bucket: true
+      http.server.requests.seconds.bucket.sum: true
+      http.server.requests.seconds.bucket.count: true
+      http.server.requests.seconds.sum.count: true
+      http.server.requests.seconds.bucket.sum.count: true
+      http.server.requests.seconds.bucket.le: true
+      http.server.requests.seconds.bucket.le.count: true
+      http.server.requests.seconds.bucket.le.sum: true
+      http.server.requests.seconds.bucket.le.sum.count: true
+      http.server.requests.seconds.bucket.le.sum.bucket: true
+      http.server.requests.seconds.bucket.le.sum.bucket.count: true
+      http.server.requests.seconds.bucket.le.sum.bucket.sum: true
+      http.server.requests.seconds.bucket.le.sum.bucket.sum.count: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+management.endpoints.web.exposure.include: "*"
+management.endpoint.health.show-details: always
