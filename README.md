@@ -47,7 +47,51 @@ Let us understand some basics on Prometheus, Grafana, Jaeger, and OpenTelemetry.
 
 ---
 
-# 1. Business Workflow — Forex Qualification Pipeline
+# Table of Contents
+
+1. [Business Workflow — Forex Qualification Pipeline](#1-business-workflow-for-forex-qualification-pipeline)
+
+2. [Expert SREs — What Matters](#2-expert-sres--what-matters)
+    - [Critical Golden Signals](#critical-golden-signals)
+    - [Detailed SRE Dimensions & Dashboards](#detailed-sre-dimensions--dashboards)
+        - [1. Client Strategy Latency Comparison Dashboard](#1-client-strategy-latency-comparison-dashboard)
+            - [Dimensions Notes for Client Strategy Latency Comparison](#-dimensions-notes-for-client-strategy-latency-comparison)
+                - [Dimension 1: URI Dimension](#dimension-1-uri-dimension)
+                - [Dimension 2: HTTP Method Dimension](#dimension-2-http-method-dimension)
+                - [Dimension 3: Status Code Dimension](#dimension-3-status-code-dimension)
+                - [Dimension 4: Downstream Service Dimension](#dimension-4-downstream-service-dimension)
+        - [2. Resource Saturation Dashboard](#2-resource-saturation-dashboard)
+            - [Dimension 1: Tomcat Thread Pool Saturation](#dimension-1-tomcat-thread-pool-saturation)
+            - [Dimension 2: Tomcat Connection Pool Saturation](#dimension-2-tomcat-connection-pool-saturation)
+            - [Dimension 3: Netty (WebClient) Event-Loop Saturation](#dimension-3-netty-webclient-event-loop-saturation)
+            - [Dimension 4: JVM Resource Saturation](#dimension-4-jvm-resource-saturation)
+        - [3. Error Budget Burn Dashboard](#3-error-budget-burn-dashboard--deep-explanation)
+        - [4. Concurrency Scaling Dashboard](#4-concurrency-scaling-dashboard--deep-explanation)
+        - [5. Downstream Dependency Health](#5-downstream-dependency-health--deep-explanation)
+
+3. [Recording Rules](#3-recording-rules)
+
+4. [Expert Java Developers — Deep Technical Insights](#4-expert-java-developers--deep-technical-insights)
+    - [Threading Models](#threading-models)
+    - [JVM & Concurrency Details](#jvm--concurrency-details)
+
+5. [Achieving Non-Blocking Behavior While Using Tomcat](#5-achieving-nonblocking-behavior-while-using-tomcat)
+
+6. [Tomcat vs Netty Distinction](#6-tomcat-vs-netty-distinction)
+
+7. [Extended KPIs, SLIs, SLOs](#7-extended-kpis-slis-slos-15-each)
+    - [7.1 KPIs (Table)](#71-kpis-table)
+    - [7.2 SLIs (Table)](#72-slis-table)
+    - [7.3 SLOs (Table)](#73-slos-table)
+
+8. [Running the Engine](#8-running-the-engine)
+
+9. [Summary](#summary)
+
+---
+
+
+# 1. Business Workflow for Forex Qualification Pipeline
 
 The API:
 
