@@ -1,6 +1,14 @@
 {
-  "requestedPromoCodes": "{{#toJson}}{{jsonPath request.body '$.promoCodes'}}{{/toJson}}",
-"validPromoCodes": "{{#toJson}}{{jsonPath request.body '$.promoCodes'}}{{/toJson}}",
+  "requestedPromoCodes": [
+    "PROMO10",
+    "PROMO11",
+    "PROMO12"
+  ],
+"validPromoCodes": [
+  "PROMO10",
+  "PROMO11",
+  "PROMO12"
+],
 "invalidPromoCodes": [],
-"discountPercent": "{{randomInt min=1 max=20}}"
+"discountPercent": {{randomInt min=1 max=20}}
 }
