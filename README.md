@@ -10,7 +10,7 @@ Built for **production-grade benchmarking**, **observability**, **SRE-driven ana
 
 Let us understand some basics on Prometheus, Grafana, Jaeger, and OpenTelemetry.
 
-Prometheus:
+**Prometheus:**
 - Primary Function: Metrics Monitoring. Collects and stores time-series data like resource usage (CPU, memory, etc.) and custom application metrics
 - Data Collection: Pull-based, scrapes metrics endpoints from services at regular intervals.
 - Role: Time-series monitoring and alerting (Architecture: Pull model, Data model: Time series, labels, and samples)
@@ -26,7 +26,7 @@ Prometheus:
 - Exported data sources: Prometheus server, remote storage, exporters, etc.
 - Exported data formats: Prometheus exposition format, OpenTelemetry format, etc.
 
-Jaeger:
+**Jaeger:**
 - Primary Function: Distributed Tracing. Tracks user requests across multiple microservices to pinpoint bottlenecks and failures.
 - Data Collection: Push-based. Trace data is pushed from application instances to Jaeger collectors.
 - Role: Distributed tracing for microservices (Architecture: Push model, Data model: Spans, Trace IDs, Trace context)
@@ -36,7 +36,7 @@ Jaeger:
   - Pinpointing bottlenecks, debugging complex transactions, understanding service interactions
   - Root cause analysis of latency issues and application-level errors in complex microservice architectures.
 
-Grafana:
+**Grafana:**
 - Primary Function: Visualization & Analysis: A dashboarding platform used to query, visualize, and alert on data from various sources (including Prometheus and Jaeger).
 - Data Collection: Connects to data sources: Does not collect data itself but connects to backends like Prometheus or Jaeger to retrieve data for display.
 - Role: Data visualization and dashboards for observability.
