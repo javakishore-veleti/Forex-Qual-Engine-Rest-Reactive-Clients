@@ -11,7 +11,9 @@ Built for **production-grade benchmarking**, **observability**, **SRE-driven ana
 Let us understand some basics on Prometheus, Grafana, Jaeger, and OpenTelemetry.
 
 **Wiremock:** ( http://localhost:8081/__admin/ )
+
 **OpenAPI:** ( http://localhost:8080/swagger-ui/index.html )
+
 **Prometheus:** ( http://localhost:8080/actuator/prometheus and http://localhost:9090/rules )
 - Primary Function: Metrics Monitoring. Collects and stores time-series data like resource usage (CPU, memory, etc.) and custom application metrics
 - Data Collection: Pull-based, scrapes metrics endpoints from services at regular intervals.
