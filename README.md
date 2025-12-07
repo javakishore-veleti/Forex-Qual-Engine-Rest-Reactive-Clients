@@ -8,6 +8,43 @@ A Spring Boot 3.5.x–based Forex Qualification Engine demonstrating three HTTP 
 
 Built for **production-grade benchmarking**, **observability**, **SRE-driven analysis**, and **high‑concurrency performance comparisons** across blocking and non‑blocking paradigms.
 
+Let us understand some basics on Prometheus, Grafana, Jaeger, and OpenTelemetry.
+
+Prometheus:
+- Primary Function: Metrics Monitoring. Collects and stores time-series data like resource usage (CPU, memory, etc.) and custom application metrics
+- Data Collection: Pull-based, scrapes metrics endpoints from services at regular intervals.
+- Role: Time-series monitoring and alerting (Architecture: Pull model, Data model: Time series, labels, and samples)
+- What it does: 
+  - Pulls (scrapes) metrics (numbers, rates) from system endpoints, storing them locally
+  - Collects metrics from applications and services, stores them, and exposes them via HTTP.
+- Use cases:
+  - System health, resource usage, basic performance trends
+  - Monitoring, alerting, and performance analysis.
+  - Monitoring system health, tracking trends, and triggering alerts when metrics exceed thresholds.
+- Exporters: Prometheus client libraries, OpenTelemetry Collector
+- Exported metrics: Micrometer, JMX, JVM, Spring Boot Actuator, etc.
+- Exported data sources: Prometheus server, remote storage, exporters, etc.
+- Exported data formats: Prometheus exposition format, OpenTelemetry format, etc.
+
+Jaeger:
+- Primary Function: Distributed Tracing. Tracks user requests across multiple microservices to pinpoint bottlenecks and failures.
+- Data Collection: Push-based. Trace data is pushed from application instances to Jaeger collectors.
+- Role: Distributed tracing for microservices (Architecture: Push model, Data model: Spans, Trace IDs, Trace context)
+- What it does: 
+  - Tracks individual requests as they travel through multiple services, visualizing dependencies and latency
+- Use cases:
+  - Pinpointing bottlenecks, debugging complex transactions, understanding service interactions
+  - Root cause analysis of latency issues and application-level errors in complex microservice architectures.
+
+Grafana:
+- Primary Function: Visualization & Analysis: A dashboarding platform used to query, visualize, and alert on data from various sources (including Prometheus and Jaeger).
+- Data Collection: Connects to data sources: Does not collect data itself but connects to backends like Prometheus or Jaeger to retrieve data for display.
+- Role: Data visualization and dashboards for observability.
+- What it does: Connects to data sources (Prometheus, Jaeger, etc.) to create dynamic, customizable dashboards.
+- Use case:
+  - Creating unified, high-level dashboards to gain a holistic view of system health and performance.
+  - Centralized monitoring, creating clear views of metrics & traces, setting up alerts.
+
 ---
 
 # 1. Business Workflow — Forex Qualification Pipeline
